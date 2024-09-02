@@ -1,0 +1,43 @@
+[gd_scene load_steps=8 format=3 uid="uid://b2k886kn8sd2y"]
+
+[ext_resource type="Script" path="res://eu.gd" id="1_7jeha"]
+[ext_resource type="Texture2D" uid="uid://bkgby1a2hc1gp" path="res://assets/face.png" id="2_jy1v5"]
+[ext_resource type="Script" path="res://CameraScripts/Camera_Controller.gd" id="2_svxuo"]
+
+[sub_resource type="PrismMesh" id="PrismMesh_f4n7y"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rmcwj"]
+albedo_texture = ExtResource("2_jy1v5")
+uv1_offset = Vector3(0.5, 0, 0)
+texture_filter = 0
+
+[sub_resource type="SphereMesh" id="SphereMesh_wii1v"]
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_nwtuf"]
+
+[node name="Eu" type="CharacterBody3D"]
+script = ExtResource("1_7jeha")
+
+[node name="PlayerModel" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("PrismMesh_f4n7y")
+
+[node name="Head" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+material_override = SubResource("StandardMaterial3D_rmcwj")
+mesh = SubResource("SphereMesh_wii1v")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape3D_nwtuf")
+
+[node name="Camera_Twist" type="Node3D" parent="."]
+top_level = true
+script = ExtResource("2_svxuo")
+
+[node name="Camera_Pitch" type="Node3D" parent="Camera_Twist"]
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 0, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Camera_Twist/Camera_Pitch"]
+transform = Transform3D(1, 0, 0, 0, 1, 1.49012e-08, 0, -1.49012e-08, 1, 0, 1.8, 5)

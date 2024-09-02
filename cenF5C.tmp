@@ -1,0 +1,60 @@
+[gd_scene load_steps=11 format=3 uid="uid://bl3w81m6ok38y"]
+
+[ext_resource type="PackedScene" uid="uid://b2k886kn8sd2y" path="res://eu.tscn" id="1_dnmpn"]
+[ext_resource type="Texture2D" uid="uid://dbyyrhna031gx" path="res://icon.svg" id="2_wlt03"]
+[ext_resource type="Script" path="res://Sprite3D.gd" id="3_sgm8a"]
+[ext_resource type="PackedScene" uid="uid://kpp8mxcmg1sf" path="res://Coin/coin.tscn" id="4_a0rvu"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2tbwf"]
+albedo_color = Color(0.392157, 1, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_2ye8y"]
+size = Vector3(10, 0.5, 10)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3dmmu"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7sd6"]
+sky_top_color = Color(0, 0.196078, 1, 1)
+sky_horizon_color = Color(0.196078, 0.392157, 1, 1)
+ground_bottom_color = Color(0, 0.392157, 0, 1)
+ground_horizon_color = Color(0, 0.784314, 0, 1)
+
+[sub_resource type="Sky" id="Sky_d42dd"]
+sky_material = SubResource("ProceduralSkyMaterial_k7sd6")
+
+[sub_resource type="Environment" id="Environment_d721y"]
+background_mode = 2
+sky = SubResource("Sky_d42dd")
+
+[node name="Cena" type="Node3D"]
+
+[node name="StaticBody3D" type="StaticBody3D" parent="."]
+metadata/_edit_group_ = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+material_override = SubResource("StandardMaterial3D_2tbwf")
+mesh = SubResource("BoxMesh_2ye8y")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
+transform = Transform3D(10, 0, 0, 0, 0.5, 0, 0, 0, 10, 0, -0.25, 0)
+shape = SubResource("BoxShape3D_3dmmu")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 10, 0)
+shadow_enabled = true
+
+[node name="Eu" parent="." instance=ExtResource("1_dnmpn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_d721y")
+
+[node name="Sprite3D" type="Sprite3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
+visible = false
+texture = ExtResource("2_wlt03")
+script = ExtResource("3_sgm8a")
+
+[node name="Coin" parent="." instance=ExtResource("4_a0rvu")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.15858, -3)

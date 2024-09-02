@@ -1,0 +1,86 @@
+[gd_scene load_steps=14 format=3 uid="uid://b2k886kn8sd2y"]
+
+[ext_resource type="Script" path="res://Player/player.gd" id="1_7jeha"]
+[ext_resource type="Texture2D" uid="uid://bkgby1a2hc1gp" path="res://assets/face.png" id="2_jy1v5"]
+[ext_resource type="PackedScene" uid="uid://cy36aygvs66pn" path="res://assets/models/gobot/gobot_skin.tscn" id="2_mjd0f"]
+[ext_resource type="Script" path="res://CameraScripts/Camera_Controller.gd" id="2_svxuo"]
+[ext_resource type="Script" path="res://Player/States/state_machine.gd" id="5_1i5tj"]
+[ext_resource type="Script" path="res://Player/States/idle.gd" id="6_os27r"]
+[ext_resource type="Script" path="res://Player/States/move.gd" id="7_c745b"]
+[ext_resource type="Script" path="res://Player/States/jump.gd" id="8_av3pk"]
+[ext_resource type="Script" path="res://Player/States/fall.gd" id="9_q06yn"]
+
+[sub_resource type="PrismMesh" id="PrismMesh_f4n7y"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rmcwj"]
+albedo_texture = ExtResource("2_jy1v5")
+uv1_offset = Vector3(0.5, 0, 0)
+texture_filter = 0
+
+[sub_resource type="SphereMesh" id="SphereMesh_wii1v"]
+radial_segments = 8
+rings = 4
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_cbuxo"]
+
+[node name="Player" type="CharacterBody3D"]
+floor_constant_speed = true
+script = ExtResource("1_7jeha")
+walk_top_speed = 11.0
+accel = 80.0
+decel = 200.0
+friction = 30.0
+air_accel = 80.0
+air_decel = 5.0
+jump_height = 4.0
+
+[node name="PlayerModel" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+visible = false
+mesh = SubResource("PrismMesh_f4n7y")
+
+[node name="Head" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -1.06581e-14)
+visible = false
+material_override = SubResource("StandardMaterial3D_rmcwj")
+mesh = SubResource("SphereMesh_wii1v")
+
+[node name="GobotSkin" parent="." instance=ExtResource("2_mjd0f")]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(0.75, 0, 0, 0, 0.9, 0, 0, 0, 0.75, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_cbuxo")
+
+[node name="Camera_Twist" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+top_level = true
+script = ExtResource("2_svxuo")
+initial_distance = 4.0
+initial_height = 1.5
+mouse_sensitivity = 0.2
+
+[node name="Camera_Pitch" type="Node3D" parent="Camera_Twist"]
+transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 0, 0)
+
+[node name="SpringArm3D" type="SpringArm3D" parent="Camera_Twist/Camera_Pitch"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 6)
+
+[node name="Camera3D" type="Camera3D" parent="Camera_Twist/Camera_Pitch/SpringArm3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 1.49012e-08, 0, -1.49012e-08, 1, 0, 0, 0)
+
+[node name="State_Machine" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
+script = ExtResource("5_1i5tj")
+initial_state = NodePath("Fall")
+
+[node name="Idle" type="Node" parent="State_Machine"]
+script = ExtResource("6_os27r")
+
+[node name="Move" type="Node" parent="State_Machine"]
+script = ExtResource("7_c745b")
+
+[node name="Jump" type="Node" parent="State_Machine"]
+script = ExtResource("8_av3pk")
+
+[node name="Fall" type="Node" parent="State_Machine"]
+script = ExtResource("9_q06yn")

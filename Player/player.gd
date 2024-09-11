@@ -10,10 +10,12 @@ enum States {IDLE, RUNNING, JUMPING, FALLING}
 # This variable keeps track of the character's current state.
 var state: States = States.IDLE
 
-@export var walk_top_speed := 10.0
-@export var accel := 200.0
-@export var decel := 2000.0
-@export var friction := 100.0
+#Ground movement parameters
+@export var ground_top_speed := 10.0
+@export var ground_accel := 200.0
+@export var ground_decel := 2000.0
+@export var ground_friction := 100.0
+#Air parameters
 @export var air_accel := 10.0
 @export var smash_air_decel := false
 @export var air_decel := 10.0
@@ -24,6 +26,13 @@ var state: States = States.IDLE
 @onready var jump_velocity := (jump_height * 2.0) / jump_time_to_peak
 @onready var jump_gravity := (jump_height * -2.0) / pow(jump_time_to_peak, 2)
 @onready var fall_gravity := (jump_height * -2.0) / pow(jump_time_to_descent, 2)
+#Ground slide parameters
+@export var fall_to_slide_factor := 2.0
+@export var slope_factor := 50.0
+@export var slide_boost := 5
+@onready var slide_jump := jump_velocity * 1.5
+@export var slide_friction := 50.0
+@export var drift_turn_speed := 50.0
 
 @onready var horizontal_velocity := Vector3(velocity.x, 0, velocity.z)
 
@@ -46,6 +55,20 @@ func _ready():
 	pass
 	
 func _physics_process(delta):
+	pass
+
+func get_horizontal_velocity() -> Vector3:
+	return Vector3(velocity.x, 0, velocity.z)
+	
+func get_horizontal_speed() -> float:
+	return Vector3(velocity.x, 0, velocity.z).length()
+
+func add_horizontal_speed(speed) -> void:
+	var speedx = velocity.x + velocity.x / get_horizontal_speed() * speed
+	var speedz = velocity.z + velocity.z / get_horizontal_speed() * speed
+	velocity = Vector3(speedx, velocity.y, speedz)
+
+func _process(delta):
 	# Add the gravity.
 	if not is_on_floor():
 		velocity.y -= gravity * delta
@@ -54,16 +77,9 @@ func _physics_process(delta):
 		elif velocity.y < 0:
 			_gobot.fall()
 	move_and_slide()
-	#print(get_floor_angle())
-
-func _process(delta):
+	#print(velocity)
 	#print(gravity)
-	var _camera_tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
-	#Make camera controller match player's position
-	_camera_tween.tween_property(_camera_pivot, "position:x", position.x, 0.5)
-	_camera_tween.tween_property(_camera_pivot, "position:z", position.z, 0.5)
-	#print(horizontal_velocity, "  ", horizontal_direction, "  ", horizontal_speed)
-	if is_on_floor(): _camera_tween.tween_property(_camera_pivot, "position:y", position.y, 0.5)
+	
 	#Enters camera's shoot mode when shooting, like in Risk of Rain 2
 	#if shoot_mode:
 		#elapsed += delta

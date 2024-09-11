@@ -5,9 +5,9 @@ signal foot_step
 ## Gobot's MeshInstance3D model.
 @export var gobot_model: MeshInstance3D
 ## Determines whether blinking is enabled or disabled.
-#@export var blink = true : set = _set_blink
-@export var _left_eye_mat_override: String
-@export var _right_eye_mat_override: String
+@export var blink = true : set = _set_blink
+@export var _left_eye_mat_override : String
+@export var _right_eye_mat_override : String
 @export var _open_eye: CompressedTexture2D
 @export var _close_eye: CompressedTexture2D
 
@@ -22,37 +22,35 @@ signal foot_step
 @onready var _blink_timer = %BlinkTimer
 @onready var _closed_eyes_timer = %ClosedEyesTimer
 
-#@onready var _left_eye_mat: StandardMaterial3D = gobot_model.get(_left_eye_mat_override)
-#@onready var _right_eye_mat: StandardMaterial3D = gobot_model.get(_right_eye_mat_override)
+@export var _left_eye_mat: StandardMaterial3D 
+@export var _right_eye_mat: StandardMaterial3D
 
 
-#func _ready():
-	#_blink_timer.connect(
-			#"timeout",
-			#func():
-				#_left_eye_mat.albedo_texture = _close_eye
-				#_right_eye_mat.albedo_texture = _close_eye
-				#_closed_eyes_timer.start(0.2)
-	#)
-#
-	#_closed_eyes_timer.connect(
-			#"timeout",
-			#func():
-				#_left_eye_mat.albedo_texture = _open_eye
-				#_right_eye_mat.albedo_texture = _open_eye
-				#_blink_timer.start(randf_range(1.0, 8.0))
-	#)
+func _ready():
+	_blink_timer.connect(
+			"timeout",
+			func():
+				_left_eye_mat.albedo_texture = _close_eye
+				_right_eye_mat.albedo_texture = _close_eye
+				_closed_eyes_timer.start(0.2)
+	)
+
+	_closed_eyes_timer.connect(
+			"timeout",
+			func():
+				_left_eye_mat.albedo_texture = _open_eye
+				_right_eye_mat.albedo_texture = _open_eye
+				_blink_timer.start(randf_range(1.0, 8.0))
+	)
 
 
-#func _set_blink(state: bool):
-	#if blink == state:
-		#return
-	#blink = state
-	#if blink:
-		#_blink_timer.start(0.2)
-	#else:
-		#_blink_timer.stop()
-		#_closed_eyes_timer.stop()
+func _set_blink(state: bool):
+	if blink == state:
+		return
+	blink = state
+	if blink:
+		_blink_timer.start(0.2)
+
 
 ## Sets the model to a neutral, action-free state.
 func idle():
@@ -65,6 +63,10 @@ func run():
 ## Sets the model to a walking animation or forward movement.
 func walk():
 	_state_machine.travel("Walk")
+	
+## Sets the model to a sliding animation.
+func slide():
+	_state_machine.travel("Slide")
 
 ## Sets the model to an upward-leaping animation, simulating a jump.
 func jump():

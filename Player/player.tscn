@@ -1,14 +1,16 @@
-[gd_scene load_steps=14 format=3 uid="uid://b2k886kn8sd2y"]
+[gd_scene load_steps=17 format=3 uid="uid://b2k886kn8sd2y"]
 
 [ext_resource type="Script" path="res://Player/player.gd" id="1_7jeha"]
 [ext_resource type="Texture2D" uid="uid://bkgby1a2hc1gp" path="res://assets/face.png" id="2_jy1v5"]
 [ext_resource type="PackedScene" uid="uid://cy36aygvs66pn" path="res://assets/models/gobot/gobot_skin.tscn" id="2_mjd0f"]
 [ext_resource type="Script" path="res://CameraScripts/Camera_Controller.gd" id="2_svxuo"]
+[ext_resource type="Texture2D" uid="uid://dq675fmt1rg8c" path="res://assets/models/gobot/textures/open_eye.png" id="4_thq80"]
 [ext_resource type="Script" path="res://Player/States/state_machine.gd" id="5_1i5tj"]
 [ext_resource type="Script" path="res://Player/States/idle.gd" id="6_os27r"]
 [ext_resource type="Script" path="res://Player/States/move.gd" id="7_c745b"]
 [ext_resource type="Script" path="res://Player/States/jump.gd" id="8_av3pk"]
 [ext_resource type="Script" path="res://Player/States/fall.gd" id="9_q06yn"]
+[ext_resource type="Script" path="res://Player/States/slide.gd" id="10_ua1jj"]
 
 [sub_resource type="PrismMesh" id="PrismMesh_f4n7y"]
 
@@ -21,18 +23,31 @@ texture_filter = 0
 radial_segments = 8
 rings = 4
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kcdhx"]
+resource_local_to_scene = true
+albedo_texture = ExtResource("4_thq80")
+roughness = 0.6
+uv1_offset = Vector3(0.1, 0, 0)
+texture_repeat = false
+
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_cbuxo"]
 
 [node name="Player" type="CharacterBody3D"]
 floor_constant_speed = true
+floor_max_angle = 1.0472
+floor_snap_length = 1.0
 script = ExtResource("1_7jeha")
-walk_top_speed = 11.0
-accel = 80.0
-decel = 200.0
-friction = 30.0
-air_accel = 80.0
+ground_top_speed = 12.0
+ground_accel = 80.0
+ground_decel = 120.0
+ground_friction = 20.0
+air_accel = 20.0
 air_decel = 5.0
-jump_height = 4.0
+jump_height = 6.0
+jump_time_to_descent = 0.5
+fall_to_slide_factor = 120.0
+slide_friction = 2.0
+drift_turn_speed = 2.0
 
 [node name="PlayerModel" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
@@ -47,24 +62,28 @@ mesh = SubResource("SphereMesh_wii1v")
 
 [node name="GobotSkin" parent="." instance=ExtResource("2_mjd0f")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+_left_eye_mat_override = ""
+_right_eye_mat_override = ""
+_left_eye_mat = SubResource("StandardMaterial3D_kcdhx")
+_right_eye_mat = SubResource("StandardMaterial3D_kcdhx")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(0.75, 0, 0, 0, 0.9, 0, 0, 0, 0.75, 0, 0.9, 0)
 shape = SubResource("CapsuleShape3D_cbuxo")
 
 [node name="Camera_Twist" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 top_level = true
 script = ExtResource("2_svxuo")
 initial_distance = 4.0
-initial_height = 1.5
+lock_distance = 2.0
+lock_height = 2.0
 mouse_sensitivity = 0.2
 
 [node name="Camera_Pitch" type="Node3D" parent="Camera_Twist"]
 transform = Transform3D(1, 0, 0, 0, 0.984808, 0.173648, 0, -0.173648, 0.984808, 0, 0, 0)
 
 [node name="SpringArm3D" type="SpringArm3D" parent="Camera_Twist/Camera_Pitch"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.5, 6)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 4)
 
 [node name="Camera3D" type="Camera3D" parent="Camera_Twist/Camera_Pitch/SpringArm3D"]
 transform = Transform3D(1, 0, 0, 0, 1, 1.49012e-08, 0, -1.49012e-08, 1, 0, 0, 0)
@@ -84,3 +103,6 @@ script = ExtResource("8_av3pk")
 
 [node name="Fall" type="Node" parent="State_Machine"]
 script = ExtResource("9_q06yn")
+
+[node name="Slide" type="Node" parent="State_Machine"]
+script = ExtResource("10_ua1jj")

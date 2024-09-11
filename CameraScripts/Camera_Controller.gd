@@ -9,6 +9,7 @@ extends Node3D
 
 @export var mouse_sensitivity := 0.1
 @export var analog_sensitivity := 2
+@export var vertical_ratio := 0.5
 @export var auto_sensitivity := 1
 @export var gyro_sensitivity := 0.03
 
@@ -19,7 +20,6 @@ var Pitch := 0.0
 var auto_input := 0.0
 var target_rotation := 0.0
 var lastone := 0.0
-var vertical_ratio := 0.5
 var uncalibrated_gyro := Vector3.ZERO
 
 var orientation
@@ -34,6 +34,16 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
+	var _camera_tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
+	#Make camera controller match player's position
+	_camera_tween.tween_property(self, "position:x", get_parent().position.x, 0)
+	_camera_tween.tween_property(self, "position:z", get_parent().position.z, 0)
+	if get_parent().is_on_floor():_camera_tween.tween_property(self, "position:y", get_parent().position.y, 1)
+	else:_camera_tween.tween_property(self, "position:y", get_parent().position.y, 3)
+
+	#if get_parent().velocity.y > 0: _camera_tween.tween_property(_camera_arm, "position:y", 0, 3)
+	#else: _camera_tween.tween_property(_camera_arm, "position:y", initial_height, 3)
+	
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT): Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 	if Input.is_action_just_pressed("ui_cancel"): Input.set_mouse_mode(Input.MOUSE_MODE_VISIBLE)
 	
@@ -86,7 +96,7 @@ func _unhandled_input(event: InputEvent):
 		#Manual input
 		if not Global.locked:
 			Yaw -= (r_input_dir.x * analog_sensitivity + auto_input)
-			#Pitch -= vertical_ratio * (r_input_dir.y * analog_sensitivity)
+			Pitch -= vertical_ratio * (r_input_dir.y * analog_sensitivity)
 		else: Pitch = uncalibrated_gyro.x * gyro_sensitivity
 		#if(camera != "tank") : Pitch = - input_dir.y * analog_sensitivity
 		#print("X ", input_dir.x, " Y ", input_dir.y)

@@ -12,7 +12,7 @@ uv1_scale = Vector3(1.25, 1.25, 1.25)
 uv1_triplanar = true
 
 [sub_resource type="BoxMesh" id="BoxMesh_2ye8y"]
-size = Vector3(10, 0.5, 10)
+size = Vector3(20, 0.5, 20)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_3dmmu"]
 
@@ -49,11 +49,11 @@ material_override = SubResource("StandardMaterial3D_g6nn0")
 mesh = SubResource("BoxMesh_2ye8y")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
-transform = Transform3D(10, 0, 0, 0, 0.5, 0, 0, 0, 10, 0, -0.25, 0)
+transform = Transform3D(20, 0, 0, 0, 0.5, 0, 0, 0, 20, 0, -0.25, 0)
 shape = SubResource("BoxShape3D_3dmmu")
 
 [node name="StaticBody3D2" type="StaticBody3D" parent="."]
-transform = Transform3D(20, 0, 0, 0, 20, 0, 0, 0, 20, 0, 0, 0)
+transform = Transform3D(18.7938, -6.84039, 0, 6.84039, 18.7938, 0, 0, 0, 20, 0, -4, 0)
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D2"]
@@ -66,7 +66,7 @@ transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 1, 0, 
 shape = SubResource("ConvexPolygonShape3D_uty70")
 
 [node name="StaticBody3D3" type="StaticBody3D" parent="."]
-transform = Transform3D(-20, 0, 1.74846e-06, 0, 20, 0, -1.74846e-06, 0, -20, 0, 0, 0)
+transform = Transform3D(-20, 0, 3.01992e-06, 0, 20, 0, -3.01992e-06, 0, -20, 0, 0, 0)
 metadata/_edit_group_ = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D3"]
@@ -79,7 +79,7 @@ transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 1, 0, 
 shape = SubResource("ConvexPolygonShape3D_uty70")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 10, 0)
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
 shadow_enabled = true
 
 [node name="Eu" parent="." instance=ExtResource("1_dnmpn")]

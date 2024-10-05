@@ -13,7 +13,9 @@ extends Node3D
 @export var auto_sensitivity := 1
 @export var gyro_sensitivity := 0.03
 
-@onready var _camera_arm = $Camera_Pitch/SpringArm3D
+@onready var _camera_arm = $CameraPitch/SpringArm3D
+
+@onready var _color_rect = $CameraPitch/SpringArm3D/Camera3D/CanvasLayer/ColorRect
 
 var Yaw := 0.0
 var Pitch := 0.0
@@ -26,20 +28,20 @@ var orientation
 var Gyro=SDLGyro.new()
 # Called when the node enters the scene tree for the first time.
 func _ready():
-	_camera_arm.position.z = initial_distance
-	_camera_arm.position.y = initial_height
-	$Camera_Pitch.rotation.x = initial_pitch
+	_camera_arm.spring_length = initial_distance
+	position.y = initial_height
+	$CameraPitch.rotation.x = initial_pitch
 	Gyro.sdl_init()
 	Gyro.controller_init()#Input.set_mouse_mode(Input.MOUSE_MODE_CAPTURED)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	var _camera_tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
+	#var _camera_tween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
 	#Make camera controller match player's position
-	_camera_tween.tween_property(self, "position:x", get_parent().position.x, 0)
-	_camera_tween.tween_property(self, "position:z", get_parent().position.z, 0)
-	if get_parent().is_on_floor():_camera_tween.tween_property(self, "position:y", get_parent().position.y, 1)
-	else:_camera_tween.tween_property(self, "position:y", get_parent().position.y, 3)
+	#_camera_tween.tween_property(self, "position:x", get_parent().position.x, 0)
+	#_camera_tween.tween_property(self, "position:z", get_parent().position.z, 0)
+	#if get_parent().is_on_floor():_camera_tween.tween_property(self, "position:y", get_parent().position.y, 0)
+	#else:_camera_tween.tween_property(self, "position:y", get_parent().position.y, 0)
 
 	#if get_parent().velocity.y > 0: _camera_tween.tween_property(_camera_arm, "position:y", 0, 3)
 	#else: _camera_tween.tween_property(_camera_arm, "position:y", initial_height, 3)
@@ -64,9 +66,8 @@ func _process(delta):
 			target_rotation = 0.0
 		
 	rotate_y(Yaw*delta)
-	$Camera_Pitch.rotate_x(Pitch*delta)
-	$Camera_Pitch.rotation.x = clamp(
-		$Camera_Pitch.rotation.x, -PI/2, PI/2)
+	$CameraPitch.rotate_x(Pitch*delta)
+	$CameraPitch.rotation.x = clamp($CameraPitch.rotation.x, -PI/2, PI/2)
 	
 	Yaw = 0.0
 	Pitch = 0.0
@@ -83,8 +84,8 @@ func _process(delta):
 func _unhandled_input(event: InputEvent):
 	if event is InputEventMouseMotion:
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-			Yaw -= event.relative.x * mouse_sensitivity
-			Pitch -= event.relative.y * mouse_sensitivity
+			rotate_y(-event.relative.x * mouse_sensitivity)
+			$CameraPitch.rotate_x(-event.relative.y * mouse_sensitivity)
 			#print("X ", event.relative.x, " Y ",event.relative.y)
 	if event is InputEventJoypadMotion:
 		var input_dir = Input.get_vector("Left", "Right", "Forward", "Back", 0.2)
@@ -104,8 +105,8 @@ func _unhandled_input(event: InputEvent):
 	if Input.is_action_just_pressed("Lock"):
 		print("lockei")
 		var CameraTween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
-		CameraTween.tween_property(_camera_arm, "position:z", lock_distance, 1)
-		CameraTween.tween_property(_camera_arm, "position:y", lock_height, 1)
+		CameraTween.tween_property(_camera_arm, "spring_length", lock_distance, 1)
+		CameraTween.tween_property(self, "position:y", lock_height, 1)
 		
 	if Input.is_action_pressed("Lock"): Global.locked = true
 	else: Global.locked = false
@@ -113,5 +114,12 @@ func _unhandled_input(event: InputEvent):
 	if Input.is_action_just_released("Lock"):
 		print("deslockei")
 		var CameraTween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
-		CameraTween.tween_property(_camera_arm, "position:z", initial_distance, 1)
-		CameraTween.tween_property(_camera_arm, "position:y", initial_height, 1)
+		CameraTween.tween_property(_camera_arm, "spring_length", initial_distance, 1)
+		CameraTween.tween_property(self, "position:y", initial_height, 1)
+
+
+func _on_water_detection_area_entered(area): pass
+	#_color_rect.visible = true
+
+func _on_water_detection_area_exited(area): pass
+	#_color_rect.visible = false

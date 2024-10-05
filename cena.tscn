@@ -1,91 +1,126 @@
-[gd_scene load_steps=15 format=3 uid="uid://bl3w81m6ok38y"]
+[gd_scene load_steps=22 format=3 uid="uid://bl3w81m6ok38y"]
 
 [ext_resource type="PackedScene" uid="uid://b2k886kn8sd2y" path="res://Player/player.tscn" id="1_dnmpn"]
 [ext_resource type="Texture2D" uid="uid://d1xe0rax0mi8x" path="res://assets/textures/kenney_prototype-textures/Dark/texture_01.png" id="1_elnlr"]
 [ext_resource type="Texture2D" uid="uid://dbyyrhna031gx" path="res://icon.svg" id="2_wlt03"]
+[ext_resource type="Texture2D" uid="uid://cq7o1vkavvxax" path="res://Shaders/SKY1.png" id="2_wyph2"]
 [ext_resource type="Script" path="res://Sprite3D.gd" id="3_sgm8a"]
 [ext_resource type="PackedScene" uid="uid://kpp8mxcmg1sf" path="res://Coin/coin.tscn" id="4_a0rvu"]
+[ext_resource type="PackedScene" uid="uid://d1a2hn2lber41" path="res://Shaders/water_plane.tscn" id="7_v1xal"]
+[ext_resource type="Shader" path="res://Shaders/water2o.gdshader" id="8_mvkne"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g6nn0"]
 albedo_texture = ExtResource("1_elnlr")
-uv1_scale = Vector3(1.25, 1.25, 1.25)
+uv1_scale = Vector3(0.625, 0.625, 0.625)
 uv1_triplanar = true
+texture_filter = 4
 
 [sub_resource type="BoxMesh" id="BoxMesh_2ye8y"]
-size = Vector3(20, 0.5, 20)
+size = Vector3(12.8, 1, 12.8)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_3dmmu"]
+size = Vector3(12.8, 1, 12.8)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ohoaj"]
-albedo_color = Color(0, 0.517647, 0.627451, 1)
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_6bghr"]
+noise_type = 2
 
-[sub_resource type="PrismMesh" id="PrismMesh_p5852"]
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_ou7p6"]
+seamless = true
+as_normal_map = true
+noise = SubResource("FastNoiseLite_6bghr")
 
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_uty70"]
-points = PackedVector3Array(0, 0.5, 0.5, 0.5, -0.5, 0.5, 0, 0.5, -0.5, -0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, -0.5, -0.5)
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_31fyk"]
+noise_type = 2
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_k7sd6"]
-sky_top_color = Color(0, 0.196078, 1, 1)
-sky_horizon_color = Color(0.196078, 0.392157, 1, 1)
-ground_bottom_color = Color(0, 0.392157, 0, 1)
-ground_horizon_color = Color(0, 0.784314, 0, 1)
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_s7b6m"]
+seamless = true
+as_normal_map = true
+noise = SubResource("FastNoiseLite_31fyk")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_6rla1"]
+render_priority = 0
+shader = ExtResource("8_mvkne")
+shader_parameter/primary_color = Color(0, 0.392157, 1, 1)
+shader_parameter/secondary_color = Color(0, 0.215686, 0.588235, 1)
+shader_parameter/roughness = 0.0
+shader_parameter/normalmap_a_strength = 0.5
+shader_parameter/normalmap_b_strength = 0.25
+shader_parameter/movement_direction = Vector2(0.2, 0.1)
+shader_parameter/movement_strength = 0.12
+shader_parameter/uv_scale = 1.0
+shader_parameter/depth_distance = 25.0
+shader_parameter/beers_law = 10.0
+shader_parameter/water_opacity = 0.0
+shader_parameter/normalmap_a = SubResource("NoiseTexture2D_ou7p6")
+shader_parameter/normalmap_b = SubResource("NoiseTexture2D_s7b6m")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_8di4n"]
+lightmap_size_hint = Vector2i(64, 64)
+material = SubResource("ShaderMaterial_6rla1")
+size = Vector2(12.5, 12.5)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_gs5jn"]
+size = Vector3(12.5, 2, 12.5)
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_686de"]
+panorama = ExtResource("2_wyph2")
+filter = false
 
 [sub_resource type="Sky" id="Sky_d42dd"]
-sky_material = SubResource("ProceduralSkyMaterial_k7sd6")
+sky_material = SubResource("PanoramaSkyMaterial_686de")
 
 [sub_resource type="Environment" id="Environment_d721y"]
 background_mode = 2
 sky = SubResource("Sky_d42dd")
+tonemap_mode = 3
+tonemap_exposure = 0.6
+tonemap_white = 0.5
 
 [node name="Cena" type="Node3D"]
 
-[node name="StaticBody3D" type="StaticBody3D" parent="."]
-transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
-metadata/_edit_group_ = true
+[node name="Eu" parent="." instance=ExtResource("1_dnmpn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
+ground_top_speed = 12.0
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.25, 0)
+[node name="Floor" type="StaticBody3D" parent="."]
+transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 material_override = SubResource("StandardMaterial3D_g6nn0")
 mesh = SubResource("BoxMesh_2ye8y")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D"]
-transform = Transform3D(20, 0, 0, 0, 0.5, 0, 0, 0, 20, 0, -0.25, 0)
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 shape = SubResource("BoxShape3D_3dmmu")
 
-[node name="StaticBody3D2" type="StaticBody3D" parent="."]
-transform = Transform3D(18.7938, -6.84039, 0, 6.84039, 18.7938, 0, 0, 0, 20, 0, -4, 0)
-metadata/_edit_group_ = true
+[node name="Objects" type="Node3D" parent="."]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D2"]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 1, 0, 0)
-material_override = SubResource("StandardMaterial3D_ohoaj")
-mesh = SubResource("PrismMesh_p5852")
+[node name="Pool" type="CSGTorus3D" parent="Objects"]
+transform = Transform3D(40, 0, 0, 0, 20, 0, 0, 0, 40, 0, 0, 0)
+use_collision = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D2"]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 1, 0, 0)
-shape = SubResource("ConvexPolygonShape3D_uty70")
+[node name="PoolWater" type="MeshInstance3D" parent="Objects/Pool"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0.2, 0)
+mesh = SubResource("PlaneMesh_8di4n")
+skeleton = NodePath("../../..")
 
-[node name="StaticBody3D3" type="StaticBody3D" parent="."]
-transform = Transform3D(-20, 0, 3.01992e-06, 0, 20, 0, -3.01992e-06, 0, -20, 0, 0, 0)
-metadata/_edit_group_ = true
+[node name="Area3D" type="Area3D" parent="Objects/Pool/PoolWater"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
+collision_layer = 3
+collision_mask = 3
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="StaticBody3D3"]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 1, 0, 0)
-material_override = SubResource("StandardMaterial3D_ohoaj")
-mesh = SubResource("PrismMesh_p5852")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="StaticBody3D3"]
-transform = Transform3D(-4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0, 1, 1, 0, 0)
-shape = SubResource("ConvexPolygonShape3D_uty70")
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
-shadow_enabled = true
-
-[node name="Eu" parent="." instance=ExtResource("1_dnmpn")]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Objects/Pool/PoolWater/Area3D"]
+shape = SubResource("BoxShape3D_gs5jn")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_d721y")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+top_level = true
+shadow_enabled = true
+directional_shadow_mode = 1
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
@@ -95,3 +130,8 @@ script = ExtResource("3_sgm8a")
 
 [node name="Coin" parent="." instance=ExtResource("4_a0rvu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.15858, -3)
+visible = false
+
+[node name="WaterPlane" parent="." instance=ExtResource("7_v1xal")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
+visible = false

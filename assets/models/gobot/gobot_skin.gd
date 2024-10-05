@@ -12,6 +12,7 @@ signal foot_step
 @export var _close_eye: CompressedTexture2D
 
 @onready var _animation_tree: AnimationTree = %AnimationTree
+@onready var _animation_player: AnimationPlayer = $gobot/AnimationPlayer
 @onready var _state_machine: AnimationNodeStateMachinePlayback = _animation_tree.get(
 		"parameters/StateMachine/playback"
 )
@@ -67,10 +68,17 @@ func walk():
 ## Sets the model to a sliding animation.
 func slide():
 	_state_machine.travel("Slide")
+	
+func slide_right():
+	_state_machine.travel("Slide_Right")
 
 ## Sets the model to an upward-leaping animation, simulating a jump.
 func jump():
 	_state_machine.travel("Jump")
+	
+## Sets the model to an upward-leaping animation, simulating a jump.
+func jump_flip():
+	_state_machine.travel("JumpFlip")
 
 ## Sets the model to a downward animation, imitating a fall.
 func fall():
@@ -79,16 +87,37 @@ func fall():
 ## Sets the model to an edge-grabbing animation.
 func edge_grab():
 	_state_machine.travel("EdgeGrab")
-
+	#_animation_tree.set_callback_mode_process(2)
+	
+## Sets the model to an edge-grabbing animation.
+func edge_aim(pos : float):
+	if not _state_machine.get_current_node() == "EdgeAim":
+		_state_machine.travel("EdgeAim", false)
+	pos -= _state_machine.get_current_play_position()
+	_animation_tree.advance(pos)
+	printt(pos)
+	#_state_machine.start("EdgeAim")
+	#print(_animation_player.speed_scale)
+	#_animation_player.seek(pos)
+	
 ## Sets the model to a wall-sliding animation.
 func wall_slide():
+	print("grudei")
 	_state_machine.travel("WallSlide")
 
-## Plays a one-shot front-flip animation.
-## This animation does not play in parallel with other states.
-func flip():
-	_animation_tree.set(_flip_shot_path, true)
+### Plays a one-shot front-flip animation.
+### This animation does not play in parallel with other states.
+#func flip():
+	#_animation_tree.set(_flip_shot_path, true)
 
+## Sets the model to a water floating animation.
+func float():
+	_state_machine.travel("Float")
+
+## Sets the model to a water floating animation.
+func swim():
+	_state_machine.travel("Swim")
+	
 ## Makes a victory sign.
 func victory_sign():
 	_state_machine.travel("VictorySign")

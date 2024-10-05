@@ -14,11 +14,13 @@ config/name="Do 0"
 config/tags=PackedStringArray("3d", "platformer")
 run/main_scene="res://cena.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
+run/max_fps=60
 config/icon="res://icon.svg"
 
 [autoload]
 
 Global="*res://Global.gd"
+EmbedGameAutoload="*res://addons/fabimakesgames.embed_game/embed_game_autoload.gd"
 
 [debug]
 
@@ -28,6 +30,10 @@ gdscript/warnings/untyped_declaration=1
 
 window/size/always_on_top=true
 window/vsync/vsync_mode=0
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/fabimakesgames.embed_game/plugin.cfg")
 
 [input]
 
@@ -111,6 +117,20 @@ Slide={
 , Object(InputEventJoypadButton,"resource_local_to_scene":false,"resource_name":"","device":-1,"button_index":1,"pressure":0.0,"pressed":true,"script":null)
 ]
 }
+Reset={
+"deadzone": 0.5,
+"events": [Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":-1,"window_id":0,"alt_pressed":false,"shift_pressed":false,"ctrl_pressed":false,"meta_pressed":false,"pressed":false,"keycode":0,"physical_keycode":82,"key_label":0,"unicode":114,"location":0,"echo":false,"script":null)
+]
+}
+
+[layer_names]
+
+3d_physics/layer_2="Water"
+
+[physics]
+
+common/physics_jitter_fix=0.0
+jolt_3d/solver/position_correction=0.0
 
 [rendering]
 

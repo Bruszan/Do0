@@ -1,11 +1,17 @@
 class_name Player extends CharacterBody3D
 
-@onready var _player_pivot = $GobotSkin
-@onready var _gobot = $GobotSkin
-@onready var _skeleton = $GobotSkin/gobot/Armature/Skeleton3D
-@onready var _camera_pivot = $Camera_Twist
+@onready var _player_pivot = $PlayerPivot
+@onready var _gobot = $PlayerPivot/GobotSkin
+@onready var _skeleton = $PlayerPivot/GobotSkin/gobot/Armature/Skeleton3D
+@onready var _camera_pivot = $CameraTwist
+@onready var _camera_pitch = $CameraTwist/CameraPitch
+
+@onready var _wall_raycast = $PlayerPivot/WallRayCast3D
+@onready var _hand_raycast = $PlayerPivot/HandRayCast3D
+
+@onready var _water_detector = $PlayerPivot/WaterDetection
 # This enum lists all the possible states the character can be in.
-enum States {IDLE, RUNNING, JUMPING, FALLING}
+enum States {IDLE, RUNNING, JUMPING, FALLING, WALLING, EDGING}
 
 # This variable keeps track of the character's current state.
 var state: States = States.IDLE
@@ -17,22 +23,38 @@ var state: States = States.IDLE
 @export var ground_friction := 100.0
 #Air parameters
 @export var air_accel := 10.0
+
+@export var sakurai_jump := false
+@export var sakurai_jump_velocity := 24.0
+@export var sakurai_jump_duration := 0.2
+@export var sakurai_jump_gravity := 120.0
+@export var sakurai_gravity := 80.0
+
+@export var jump_height := 7.2
+@export var jump_time_to_peak := 0.39
+@export var jump_time_to_descent := 0.43
+##Deceleration in the air if there is no input
 @export var smash_air_decel := false
 @export var air_decel := 10.0
-@export var jump_height := 5.0
-@export var jump_time_to_peak := 0.6
-@export var jump_time_to_descent := 0.4
 
 @onready var jump_velocity := (jump_height * 2.0) / jump_time_to_peak
 @onready var jump_gravity := (jump_height * -2.0) / pow(jump_time_to_peak, 2)
 @onready var fall_gravity := (jump_height * -2.0) / pow(jump_time_to_descent, 2)
 #Ground slide parameters
-@export var fall_to_slide_factor := 2.0
+@export var fall_to_slope_factor := 2.0
+#@export var jump_slope_velocity := 50.0
 @export var slope_factor := 50.0
 @export var slide_boost := 5
-@onready var slide_jump := jump_velocity * 1.5
 @export var slide_friction := 50.0
 @export var drift_turn_speed := 50.0
+#Wall Slide parameters
+@export var wall_fall_gravity := 10.0
+@export var wall_jump_y_velocity := 8.0
+@export var wall_jump_velocity := 10.0
+#Dive parameters
+@export var swim_speed := 10.0
+@export var swim_friction := 100.0
+@export var swim_turn := 15.0
 
 @onready var horizontal_velocity := Vector3(velocity.x, 0, velocity.z)
 
@@ -52,7 +74,7 @@ var world_gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var gravity := jump_gravity
 
 func _ready():
-	pass
+	_hand_raycast.set_process(false)
 	
 func _physics_process(delta):
 	pass
@@ -63,22 +85,26 @@ func get_horizontal_velocity() -> Vector3:
 func get_horizontal_speed() -> float:
 	return Vector3(velocity.x, 0, velocity.z).length()
 
-func add_horizontal_speed(speed) -> void:
+func add_horizontal_speed(speed: float) -> void:
 	var speedx = velocity.x + velocity.x / get_horizontal_speed() * speed
 	var speedz = velocity.z + velocity.z / get_horizontal_speed() * speed
 	velocity = Vector3(speedx, velocity.y, speedz)
+	
+func set_speed_to_direction(xspeed: float, h_direction: Vector3, yspeed: float) -> void:
+	velocity = Vector3(h_direction.x * xspeed, yspeed, h_direction.z * xspeed)
 
 func _process(delta):
 	# Add the gravity.
-	if not is_on_floor():
+	if not is_on_floor() and get_motion_mode() == MotionMode.MOTION_MODE_GROUNDED:
 		velocity.y -= gravity * delta
-		if velocity.y > 0:
-			_gobot.jump()
-		elif velocity.y < 0:
-			_gobot.fall()
+
 	move_and_slide()
-	#print(velocity)
-	#print(gravity)
+	#Rotate the player to its velocity direction
+	if get_horizontal_velocity():
+		var velocity_dir = atan2(velocity.x, velocity.z)
+		_player_pivot.rotation.y = lerp_angle(_player_pivot.rotation.y, velocity_dir, 30*delta)
+
+	##Old script below
 	
 	#Enters camera's shoot mode when shooting, like in Risk of Rain 2
 	#if shoot_mode:
@@ -113,39 +139,41 @@ func _process(delta):
 				aim_direction = 0.0
 		elif Global.camera_mode == "free":
 			#Rotate head by the direction of the right stick and limit it to just 180 degrees in relation to the body
-			print("eae")
 			#$Head.rotation.y = clampf(aim_direction + int(_player_pivot.rotation.y/PI) 
 									#* PI, _player_pivot.rotation.y - PI/2, _player_pivot.rotation.y + PI/2)
 							#Head direction should be the angle in relation to player's body
 			#var head_direction :=  aim_direction + int(_player_pivot.rotation.y/PI) * PI
 			#print(aim_direction, "  ", head_direction, "  ", $Head.rotation.y, "  ", _player_pivot.rotation.y)
-			if Global.locked: $Camera_Twist.target_rotation = lerp_angle($Camera_Twist.rotation.y, aim_direction-PI, 30*delta)
+			if Global.locked: _camera_pivot.target_rotation = lerp_angle(_camera_pivot.rotation.y, aim_direction-PI, 30*delta)
 			#$Head.rotation.y = aim_direction
 			
 			#Rotate the body if the head reach a rotation larger than 90 degrees compared to the body
 			#if abs(abs($Head.rotation.y) - abs(_player_pivot.rotation.y)) >= PI/2: _player_pivot.rotation.y = $Head.rotation.y - PI/2
 		elif Global.camera_mode != "strafe": $Head.rotation.y = lerp_angle($Head.rotation.y, _player_pivot.rotation.y, 20*delta)
-		print($Head.rotation.y, "  ", _player_pivot.rotation.y)
+		#print($Head.rotation.y, "  ", _player_pivot.rotation.y)
 
 func _unhandled_input(event):
+	if Input.is_action_just_pressed("Reset"):
+		position = Vector3.ZERO
+	
 	if event is InputEventMouseMotion:
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
-			if Global.camera_mode == "strafe": aim_direction = $Camera_Twist.rotation.y - PI
+			if Global.camera_mode == "strafe": aim_direction = _camera_pivot.rotation.y - PI
 	
 	if event is InputEventJoypadMotion:
 		#$Global.camera_mode = "free"
 		if Global.camera_mode == "free":
 			var r_input_dir = Input.get_vector("R_Left", "R_Right", "R_Forward", "R_Back", 0.2)
-			r_direction = Vector3(r_input_dir.x, 0, r_input_dir.y).rotated(Vector3.UP, $Camera_Twist.rotation.y).normalized()
+			r_direction = Vector3(r_input_dir.x, 0, r_input_dir.y).rotated(Vector3.UP, _camera_pivot.rotation.y).normalized()
 			aim_direction = atan2(r_direction.x, r_direction.z)
 		elif Global.camera_mode == "strafe":
-			aim_direction = $Camera_Twist.rotation.y - PI
+			aim_direction = _camera_pivot.rotation.y - PI
 			
 	if Input.is_action_pressed("Shoot"): shoot_mode = true
 		
 	#Reset camera to the direction the player is facing
 	if Input.is_action_pressed("Reset_Camera"):
-		$Camera_Twist/Camera_Pitch.rotation.x = lerp_angle($Camera_Twist/Camera_Pitch.rotation.x,
+		_camera_pivot.rotation.x = lerp_angle(_camera_pivot.rotation.x,
 															deg_to_rad(-10),
 															20 * get_process_delta_time())
 		if direction: #If the player is holding a direction it will rotate to that direction
@@ -153,9 +181,9 @@ func _unhandled_input(event):
 		else: #If not holding any direction, the camera will reset to the player's direction
 			ang_base = _player_pivot.rotation.y
 		
-		$Camera_Twist.target_rotation = ang_base - PI
+		_camera_pivot.target_rotation = ang_base - PI
 		
-		print($Camera_Twist.target_rotation)
+		print(_camera_pivot.target_rotation)
 		
 		#var CameraTween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
 		#CameraTween.tween_property($Camera_Twist, "rotation:y", target_rotation, 1)
@@ -164,3 +192,12 @@ func _unhandled_input(event):
 		
 	#if Input.is_action_just_pressed("Left"): #Test deadzone not working
 		#print(Input.get_action_strength("Left"))
+
+
+func _on_water_detection_area_entered(area):
+	Global.on_water = true
+	print("moiado")
+
+func _on_water_detection_area_exited(area):
+	Global.on_water = false
+	print("desmoiado")

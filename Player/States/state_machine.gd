@@ -25,6 +25,7 @@ func _process(delta: float) -> void:
 
 func _physics_process(delta: float) -> void:
 	state.physics_update(delta)
+	Global.debug.add_debug_property("State", state, 1)
 
 func _transition_to_next_state(target_state_path: String, data: Dictionary = {}) -> void:
 	if not has_node(target_state_path):

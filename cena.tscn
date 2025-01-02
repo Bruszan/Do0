@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://bl3w81m6ok38y"]
+[gd_scene load_steps=33 format=3 uid="uid://bl3w81m6ok38y"]
 
 [ext_resource type="PackedScene" uid="uid://b2k886kn8sd2y" path="res://Player/player.tscn" id="1_dnmpn"]
 [ext_resource type="Texture2D" uid="uid://d1xe0rax0mi8x" path="res://assets/textures/kenney_prototype-textures/Dark/texture_01.png" id="1_elnlr"]
@@ -8,6 +8,8 @@
 [ext_resource type="PackedScene" uid="uid://kpp8mxcmg1sf" path="res://Coin/coin.tscn" id="4_a0rvu"]
 [ext_resource type="PackedScene" uid="uid://d1a2hn2lber41" path="res://Shaders/water_plane.tscn" id="7_v1xal"]
 [ext_resource type="Shader" path="res://Shaders/water2o.gdshader" id="8_mvkne"]
+[ext_resource type="PackedScene" uid="uid://6fp4j4y37vhd" path="res://Debug/debug.tscn" id="9_h3p6m"]
+[ext_resource type="PackedScene" uid="uid://d30v3c2c5im1d" path="res://GUI/pause.tscn" id="10_n1plg"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g6nn0"]
 albedo_texture = ExtResource("1_elnlr")
@@ -20,6 +22,64 @@ size = Vector3(12.8, 1, 12.8)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_3dmmu"]
 size = Vector3(12.8, 1, 12.8)
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_686de"]
+panorama = ExtResource("2_wyph2")
+filter = false
+
+[sub_resource type="Sky" id="Sky_d42dd"]
+sky_material = SubResource("PanoramaSkyMaterial_686de")
+
+[sub_resource type="Environment" id="Environment_d721y"]
+background_mode = 2
+sky = SubResource("Sky_d42dd")
+tonemap_mode = 3
+tonemap_exposure = 0.6
+tonemap_white = 0.5
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_2ayxi"]
+noise_type = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_xq444"]
+width = 1024
+height = 1024
+seamless = true
+as_normal_map = true
+noise = SubResource("FastNoiseLite_2ayxi")
+
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_35mbd"]
+noise_type = 2
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_6glte"]
+width = 1024
+height = 1024
+seamless = true
+as_normal_map = true
+noise = SubResource("FastNoiseLite_35mbd")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ud3mn"]
+resource_local_to_scene = true
+render_priority = 0
+shader = ExtResource("8_mvkne")
+shader_parameter/primary_color = Color(0.372455, 0.567747, 1, 1)
+shader_parameter/secondary_color = Color(0.19921, 0.428185, 1, 1)
+shader_parameter/roughness = 0.0
+shader_parameter/normalmap_a_strength = 0.25
+shader_parameter/normalmap_b_strength = 0.25
+shader_parameter/movement_direction = Vector2(0.2, 0.1)
+shader_parameter/movement_strength = 0.08
+shader_parameter/uv_scale = 2.0
+shader_parameter/depth_distance = 50.0
+shader_parameter/beers_law = 1.0
+shader_parameter/water_opacity = 0.5
+shader_parameter/refraction_strength = 0.5
+shader_parameter/normalmap_a = SubResource("NoiseTexture2D_xq444")
+shader_parameter/normalmap_b = SubResource("NoiseTexture2D_6glte")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_mmr7d"]
+resource_local_to_scene = true
+material = SubResource("ShaderMaterial_ud3mn")
+size = Vector2(500, 500)
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_6bghr"]
 noise_type = 2
@@ -44,46 +104,52 @@ shader_parameter/primary_color = Color(0, 0.392157, 1, 1)
 shader_parameter/secondary_color = Color(0, 0.215686, 0.588235, 1)
 shader_parameter/roughness = 0.0
 shader_parameter/normalmap_a_strength = 0.5
-shader_parameter/normalmap_b_strength = 0.25
+shader_parameter/normalmap_b_strength = 0.5
 shader_parameter/movement_direction = Vector2(0.2, 0.1)
 shader_parameter/movement_strength = 0.12
 shader_parameter/uv_scale = 1.0
-shader_parameter/depth_distance = 25.0
+shader_parameter/depth_distance = 50.0
 shader_parameter/beers_law = 10.0
-shader_parameter/water_opacity = 0.0
+shader_parameter/water_opacity = 0.5
+shader_parameter/refraction_strength = 0.02
 shader_parameter/normalmap_a = SubResource("NoiseTexture2D_ou7p6")
 shader_parameter/normalmap_b = SubResource("NoiseTexture2D_s7b6m")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_8di4n"]
-lightmap_size_hint = Vector2i(64, 64)
+lightmap_size_hint = Vector2i(32, 32)
 material = SubResource("ShaderMaterial_6rla1")
-size = Vector2(12.5, 12.5)
+size = Vector2(6, 6)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_gs5jn"]
-size = Vector3(12.5, 2, 12.5)
+size = Vector3(6, 1, 6)
 
-[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_686de"]
-panorama = ExtResource("2_wyph2")
-filter = false
+[sub_resource type="BoxShape3D" id="BoxShape3D_mhcjt"]
+size = Vector3(6, 0, 6)
 
-[sub_resource type="Sky" id="Sky_d42dd"]
-sky_material = SubResource("PanoramaSkyMaterial_686de")
+[sub_resource type="PrismMesh" id="PrismMesh_wn3ex"]
+left_to_right = 0.0
+size = Vector3(20, 20, 20)
 
-[sub_resource type="Environment" id="Environment_d721y"]
-background_mode = 2
-sky = SubResource("Sky_d42dd")
-tonemap_mode = 3
-tonemap_exposure = 0.6
-tonemap_white = 0.5
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_tekfg"]
+data = PackedVector3Array(-10, 10, 10, 10, -10, 10, -10, -10, 10, -10, 10, -10, -10, -10, -10, 10, -10, -10, -10, 10, 10, -10, 10, -10, 10, -10, 10, -10, 10, -10, 10, -10, -10, 10, -10, 10, -10, 10, -10, -10, 10, 10, -10, -10, -10, -10, 10, 10, -10, -10, 10, -10, -10, -10, -10, -10, 10, 10, -10, 10, -10, -10, -10, 10, -10, 10, 10, -10, -10, -10, -10, -10)
 
 [node name="Cena" type="Node3D"]
+process_mode = 1
 
-[node name="Eu" parent="." instance=ExtResource("1_dnmpn")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 10, 0)
-ground_top_speed = 12.0
+[node name="Entities" type="Node" parent="."]
+process_mode = 1
+
+[node name="Eu" parent="Entities" instance=ExtResource("1_dnmpn")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.53674e-07, 0)
+ground_top_speed = 20.0
+air_accel = 0.0
+wall_jump_y_velocity = 40.0
+swim_friction = 70.0
+swim_rot_turn = 6.0
 
 [node name="Floor" type="StaticBody3D" parent="."]
 transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
+collision_mask = 3
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Floor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
@@ -93,25 +159,6 @@ mesh = SubResource("BoxMesh_2ye8y")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Floor"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 shape = SubResource("BoxShape3D_3dmmu")
-
-[node name="Objects" type="Node3D" parent="."]
-
-[node name="Pool" type="CSGTorus3D" parent="Objects"]
-transform = Transform3D(40, 0, 0, 0, 20, 0, 0, 0, 40, 0, 0, 0)
-use_collision = true
-
-[node name="PoolWater" type="MeshInstance3D" parent="Objects/Pool"]
-transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0.2, 0)
-mesh = SubResource("PlaneMesh_8di4n")
-skeleton = NodePath("../../..")
-
-[node name="Area3D" type="Area3D" parent="Objects/Pool/PoolWater"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
-collision_layer = 3
-collision_mask = 3
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Objects/Pool/PoolWater/Area3D"]
-shape = SubResource("BoxShape3D_gs5jn")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_d721y")
@@ -130,8 +177,76 @@ script = ExtResource("3_sgm8a")
 
 [node name="Coin" parent="." instance=ExtResource("4_a0rvu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.15858, -3)
-visible = false
 
 [node name="WaterPlane" parent="." instance=ExtResource("7_v1xal")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.2, 0)
-visible = false
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
+mesh = SubResource("PlaneMesh_mmr7d")
+
+[node name="Objects" type="Node3D" parent="."]
+
+[node name="Pool" type="CSGTorus3D" parent="Objects"]
+transform = Transform3D(40, 0, 0, 0, 60, 0, 0, 0, 40, 0, 0, 45)
+use_collision = true
+inner_radius = 0.25
+outer_radius = 0.5
+
+[node name="PoolWater" type="MeshInstance3D" parent="Objects/Pool"]
+transform = Transform3D(0.1, 0, 0, 0, 0.1, 0, 0, 0, 0.1, 0, 0.1, 0)
+mesh = SubResource("PlaneMesh_8di4n")
+skeleton = NodePath("../../..")
+
+[node name="Area3D" type="Area3D" parent="Objects/Pool/PoolWater"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 2
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Objects/Pool/PoolWater/Area3D"]
+shape = SubResource("BoxShape3D_gs5jn")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Objects/Pool/PoolWater"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+collision_layer = 2
+collision_mask = 3
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Objects/Pool/PoolWater/StaticBody3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
+shape = SubResource("BoxShape3D_mhcjt")
+
+[node name="Ramp2" type="MeshInstance3D" parent="Objects"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -50, 10, -20)
+mesh = SubResource("PrismMesh_wn3ex")
+skeleton = NodePath("../..")
+
+[node name="StaticBody3D" type="StaticBody3D" parent="Objects/Ramp2"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Objects/Ramp2/StaticBody3D"]
+shape = SubResource("ConcavePolygonShape3D_tekfg")
+
+[node name="CSGBox3D" type="CSGBox3D" parent="Objects"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10, 15, -50)
+use_collision = true
+size = Vector3(10, 30, 10)
+
+[node name="CSGBox3D2" type="CSGBox3D" parent="Objects"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 15, -50)
+use_collision = true
+size = Vector3(10, 30, 10)
+
+[node name="GUI" type="Control" parent="."]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Debug" parent="GUI" instance=ExtResource("9_h3p6m")]
+layout_mode = 1
+
+[node name="Pause" parent="GUI" instance=ExtResource("10_n1plg")]
+layout_mode = 1
+
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -40, 0, -40)
+use_collision = true
+polygon = PackedVector2Array(20, 15, 20, 0, 0, 0)
+depth = 20.0

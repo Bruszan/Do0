@@ -4,13 +4,13 @@ func enter(previous_state_path: String, data := {}) -> void:
 	player._gobot.slide()
 	printt("slide",player.get_horizontal_speed())
 	#player.floor_snap_length = 1.0
-	
-	if player.get_horizontal_speed() <= player.ground_top_speed + player.slide_boost:
-		if player.get_horizontal_speed() >= player.ground_top_speed:
-			var actual_boost = player.ground_top_speed + player.slide_boost - player.get_horizontal_speed()
-			player.add_horizontal_speed(actual_boost)
-		else: player.add_horizontal_speed(player.slide_boost)
-		printt("BOOST", player.get_horizontal_speed())
+	if player.get_horizontal_velocity():
+		if player.get_horizontal_speed() <= player.ground_top_speed + player.slide_boost:
+			if player.get_horizontal_speed() >= player.ground_top_speed:
+				var actual_boost = player.ground_top_speed + player.slide_boost - player.get_horizontal_speed()
+				player.add_horizontal_speed(actual_boost)
+			else: player.add_horizontal_speed(player.slide_boost)
+			printt("BOOST", player.get_horizontal_speed())
 	#player.velocity = Vector3(player.velocity.x*player.slide_boost, player.velocity.y, player.velocity.z*player.slide_boost)
 
 func transform_align_with_floor(floor_normal: Vector3):
@@ -21,7 +21,8 @@ func transform_align_with_floor(floor_normal: Vector3):
 	xform.basis = xform.basis.orthonormalized()
 	return xform
 
-func update(_delta: float) -> void:
+func physics_update(_delta: float) -> void:
+
 	#With this it's accelerating without an max speed to apply
 	#And also try to find a way to convert vertical velocity into horizontal when starting the slide
 	#Vector3 value for substracting speed and getting slope physics, formula taken from Sonic physics (guide)
@@ -41,8 +42,8 @@ func update(_delta: float) -> void:
 	
 	#Slide script so that it can also be used as a drift to change the player's direction while maintaining speed
 	#Input for the player to drift while sliding
-	var input_vec = Input.get_vector("Left", "Right", "Forward", "Back", 0.1)
-	var horizontal_input = Vector3(input_vec.x, 0, input_vec.y).rotated(Vector3.UP, player._camera_pivot.rotation.y)
+	var input_dir = Input.get_vector("Left", "Right", "Forward", "Back", 0.1)
+	var horizontal_input = -player._camera_pivot.global_basis.z * input_dir.y + -player._camera_pitch.global_basis.x * input_dir.x
 	
 	##Rotating the player's velocity for drifting
 	#For rotating the player's velocity to the direction being input like this, the turn speed is dependant on the current velocity
@@ -53,7 +54,7 @@ func update(_delta: float) -> void:
 	#Take note that turn_cap is the cap of the horizontal input angle the player can input (related to the player's direction) to reach max turn speed
 	var turn_cap = PI/4
 	var clamp_ang = clamp(remap(player.velocity.signed_angle_to(horizontal_input, Vector3.UP), -turn_cap, turn_cap, -1, 1), -1, 1)
-	player.velocity = player.velocity.rotated(Vector3.UP, clamp_ang * player.drift_turn_speed * _delta)
+	player.velocity = player.velocity.rotated(Vector3.UP, clamp_ang * player.drift_turn_factor * _delta)
 	
 	#The horizontal direction which the player will rotate to, in this case, velocity
 	#var velocity_dir = atan2(player.velocity.x, player.velocity.z)
@@ -65,7 +66,7 @@ func update(_delta: float) -> void:
 	##But I don't know how to get the rotation value for x and z yet, so I'm sticking with BornCG's method that affects the entire transform
 	player._player_pivot.global_transform = transform_align_with_floor(player.get_floor_normal())
 	
-	if player.velocity == Vector3.ZERO:
+	if player.velocity == Vector3.ZERO and not Global.paused:
 		finished.emit(IDLE)
 	elif Input.is_action_just_pressed("Slide"):
 		finished.emit(RUNNING)
@@ -74,7 +75,7 @@ func update(_delta: float) -> void:
 	elif not player.is_on_floor():
 		print(player.velocity.y)
 		player.gravity =- player.fall_gravity
-		#finished.emit(FALLING)
+		finished.emit(FALLING)
 	elif Global.on_water:
 		finished.emit(DIVING)
 		

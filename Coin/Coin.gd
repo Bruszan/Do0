@@ -11,8 +11,6 @@ func _ready():
 func _process(delta):
 	rotate_y(deg_to_rad(ROT_SPEED))
 
-	#if has_overlapping_bodies():
-		#queue_free()
 
 func _on_body_entered(body):
 	queue_free()

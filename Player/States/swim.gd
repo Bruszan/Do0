@@ -6,10 +6,10 @@ func enter(previous_state_path: String, data := {}) -> void:
 	#player._gobot.swim()
 	printt("swim")
 
-func update(_delta: float) -> void:
+func physics_update(_delta: float) -> void:
 	# Get the input direction and handle the movement/deceleration.
 	var input_dir = Input.get_vector("Left", "Right", "Forward", "Back", 0.1)
-	var horizontal_input = Vector3(input_dir.x, 0, input_dir.y).rotated(Vector3.UP, player._camera_pivot.rotation.y)
+	var horizontal_input = -player._camera_pivot.global_basis.z * input_dir.y + -player._camera_pitch.global_basis.x * input_dir.x
 	#Normalize is making analog range being wrong
 	var horizontal_speed = Vector3(player.velocity.x, 0, player.velocity.z).length()
 

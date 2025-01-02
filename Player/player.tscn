@@ -1,11 +1,11 @@
-[gd_scene load_steps=24 format=3 uid="uid://b2k886kn8sd2y"]
+[gd_scene load_steps=25 format=3 uid="uid://b2k886kn8sd2y"]
 
 [ext_resource type="Script" path="res://Player/player.gd" id="1_7jeha"]
 [ext_resource type="Texture2D" uid="uid://bkgby1a2hc1gp" path="res://assets/face.png" id="2_jy1v5"]
 [ext_resource type="PackedScene" uid="uid://cy36aygvs66pn" path="res://assets/models/gobot/gobot_skin.tscn" id="2_mjd0f"]
 [ext_resource type="Texture2D" uid="uid://dq675fmt1rg8c" path="res://assets/models/gobot/textures/open_eye.png" id="4_thq80"]
-[ext_resource type="Script" path="res://CameraScripts/Camera_Controller.gd" id="5_0sg18"]
 [ext_resource type="Script" path="res://Player/States/state_machine.gd" id="5_1i5tj"]
+[ext_resource type="Script" path="res://CameraScripts/gdq_camera.gd" id="5_jwnp6"]
 [ext_resource type="Shader" path="res://Shaders/underwater.gdshader" id="6_614p6"]
 [ext_resource type="Script" path="res://Player/States/idle.gd" id="6_os27r"]
 [ext_resource type="Script" path="res://Player/States/move.gd" id="7_c745b"]
@@ -17,8 +17,10 @@
 [ext_resource type="Script" path="res://Player/States/wall_slide.gd" id="12_euwmw"]
 [ext_resource type="Script" path="res://Player/States/edge_grab.gd" id="13_7khgu"]
 
-[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_wy7sl"]
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_mvoqb"]
 radius = 0.6
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_lqdeb"]
 
 [sub_resource type="PrismMesh" id="PrismMesh_f4n7y"]
 
@@ -38,7 +40,7 @@ roughness = 0.6
 uv1_offset = Vector3(0.1, 0, 0)
 texture_repeat = false
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_lqdeb"]
+[sub_resource type="SphereShape3D" id="SphereShape3D_bdv2p"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_o3shv"]
 shader = ExtResource("6_614p6")
@@ -48,26 +50,31 @@ shader_parameter/wave_strength = 0.0
 shader_parameter/opacity = 0.5
 
 [node name="Player" type="CharacterBody3D"]
+collision_layer = 3
+collision_mask = 524289
 floor_constant_speed = true
 floor_block_on_wall = false
 floor_snap_length = 1.0
 script = ExtResource("1_7jeha")
-ground_accel = 160.0
-ground_decel = 240.0
-ground_friction = 60.0
-air_accel = 60.0
-sakurai_jump = true
-air_decel = 5.0
-slide_friction = 2.0
-drift_turn_speed = 1.0
-wall_jump_y_velocity = 20.0
-swim_speed = 5.0
+rotate_speed = 35.0
+air_accel = 30.0
+air_friction = 20.0
+wall_jump_y_velocity = 35.0
+wall_jump_velocity = 15.0
 swim_friction = 20.0
-swim_turn = 10.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0.8, 0)
-shape = SubResource("CapsuleShape3D_wy7sl")
+shape = SubResource("CylinderShape3D_mvoqb")
+
+[node name="WaterDetection" type="Area3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
+collision_layer = 524288
+collision_mask = 2
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WaterDetection"]
+transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
+shape = SubResource("SphereShape3D_lqdeb")
 
 [node name="PlayerModel" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
@@ -99,32 +106,31 @@ transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0.7, 0.4)
 target_position = Vector3(0, 0, 1)
 debug_shape_thickness = 5
 
-[node name="WaterDetection" type="Area3D" parent="PlayerPivot"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.7, 0)
-collision_layer = 2
-collision_mask = 2
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="PlayerPivot/WaterDetection"]
-transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
-shape = SubResource("SphereShape3D_lqdeb")
-
 [node name="CameraTwist" type="Node3D" parent="."]
-script = ExtResource("5_0sg18")
+unique_name_in_owner = true
+process_mode = 3
+transform = Transform3D(1, 0, 0, 0, 0.939693, -0.34202, 0, 0.34202, 0.939693, 0, 2, 0)
+script = ExtResource("5_jwnp6")
+mouse_sensitivity = 0.1
+tilt_upper_limit = 1.57
+tilt_lower_limit = -1.57
 initial_height = 2.5
-initial_pitch = 0.0
-mouse_sensitivity = 0.001
+lock_distance = 2.0
+lock_height = 2.1
 
 [node name="CameraPitch" type="Node3D" parent="CameraTwist"]
 
-[node name="SpringArm3D" type="SpringArm3D" parent="CameraTwist/CameraPitch"]
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraTwist"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+shape = SubResource("SphereShape3D_bdv2p")
 spring_length = 5.0
 margin = 0.2
 
-[node name="Camera3D" type="Camera3D" parent="CameraTwist/CameraPitch/SpringArm3D"]
+[node name="Camera3D" type="Camera3D" parent="CameraTwist/SpringArm3D"]
 
-[node name="CanvasLayer" type="CanvasLayer" parent="CameraTwist/CameraPitch/SpringArm3D/Camera3D"]
+[node name="CanvasLayer" type="CanvasLayer" parent="CameraTwist/SpringArm3D/Camera3D"]
 
-[node name="ColorRect" type="ColorRect" parent="CameraTwist/CameraPitch/SpringArm3D/Camera3D/CanvasLayer"]
+[node name="ColorRect" type="ColorRect" parent="CameraTwist/SpringArm3D/Camera3D/CanvasLayer"]
 visible = false
 material = SubResource("ShaderMaterial_o3shv")
 anchors_preset = 15
@@ -166,6 +172,6 @@ script = ExtResource("12_euwmw")
 [node name="EdgeGrab" type="Node" parent="State_Machine"]
 script = ExtResource("13_7khgu")
 
-[connection signal="area_entered" from="PlayerPivot/WaterDetection" to="." method="_on_water_detection_area_entered"]
-[connection signal="area_entered" from="PlayerPivot/WaterDetection" to="CameraTwist" method="_on_water_detection_area_entered"]
-[connection signal="area_exited" from="PlayerPivot/WaterDetection" to="." method="_on_water_detection_area_exited"]
+[connection signal="area_entered" from="WaterDetection" to="." method="_on_water_detection_area_entered"]
+[connection signal="area_entered" from="WaterDetection" to="CameraTwist" method="_on_water_detection_area_entered"]
+[connection signal="area_exited" from="WaterDetection" to="." method="_on_water_detection_area_exited"]

@@ -2,21 +2,25 @@
 
 [ext_resource type="Script" path="res://Coin/Coin.gd" id="1_wm1kk"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mal7y"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jpit8"]
 albedo_color = Color(1, 1, 0, 1)
-metallic = 0.9
+metallic = 1.0
+roughness = 0.25
 
-[sub_resource type="SphereMesh" id="SphereMesh_8qpf0"]
-material = SubResource("StandardMaterial3D_mal7y")
+[sub_resource type="CylinderMesh" id="CylinderMesh_tm88d"]
+material = SubResource("StandardMaterial3D_jpit8")
+height = 0.2
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_we5y1"]
 
 [node name="Coin" type="Area3D"]
+collision_layer = 4
+collision_mask = 2
 script = ExtResource("1_wm1kk")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.2, 0, 0, 0)
-mesh = SubResource("SphereMesh_8qpf0")
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("CylinderMesh_tm88d")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("SphereShape3D_we5y1")

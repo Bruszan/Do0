@@ -33,8 +33,7 @@ func is_edge_grabbable() -> bool:
 		player._wall_raycast.set_process(false)
 		return false
 
-func update(_delta: float) -> void:
-	elapsed += _delta
+func physics_update(_delta: float) -> void:
 	
 	if player._gobot._state_machine.get_current_node() == "JumpFlip":
 		#printt(player._gobot._state_machine.get_current_play_position() + _delta, player._gobot._state_machine.get_current_length())
@@ -57,14 +56,15 @@ func update(_delta: float) -> void:
 			finished.emit(IDLE)
 	elif is_edge_grabbable():
 		finished.emit(EDGING)
-	elif player.is_on_wall() and not abs(player.get_wall_normal().y):
-		finished.emit(WALLING)
+	#elif player.is_on_wall() and not abs(player.get_wall_normal().y):
+		#finished.emit(WALLING)
 	elif Global.on_water:
 		finished.emit(DIVING)
 			
 	# Get the input direction and handle the movement/deceleration.
-	var input_dir = Input.get_vector("Left", "Right", "Forward", "Back", 0.1)
-	var horizontal_input = Vector3(input_dir.x, 0, input_dir.y).rotated(Vector3.UP, player._camera_pivot.rotation.y)
+	var horizontal_input = player.get_horizontal_input()
+	#var input_dir = Input.get_vector("Left", "Right", "Forward", "Back", 0.1)
+	#var horizontal_input = -player._camera_pivot.global_basis.z * input_dir.y + -player._camera_pitch.global_basis.x * input_dir.x
 	#Normalize is making analog range being wrong
 	var horizontal_speed = get_horizontal_speed()
 	var horizontal_velocity = horizontal_input * horizontal_speed
@@ -80,9 +80,9 @@ func update(_delta: float) -> void:
 		
 		#var rotate_dir = atan2(player.velocity.x, player.velocity.z)
 		#player._player_pivot.rotation.y = lerp_angle(player._player_pivot.rotation.y, rotate_dir, 30 * _delta)
-	elif player.smash_air_decel:
+	elif player.has_air_friction:
 		#Desaccelerate if there is no direction being input (optional)
-		player.velocity = player.velocity.move_toward(Vector3(0, player.velocity.y, 0), player.air_decel * _delta)
+		player.velocity = player.velocity.move_toward(Vector3(0, player.velocity.y, 0), player.air_friction * _delta)
 		
 	#This is the first script I tried that seemed to replicate Odyseey's Vectoring technique
 	#player.velocity.x = clampf(player.velocity.x + horizontal_direction.x * player.air_accel, -player.walk_speed, player.walk_speed)
@@ -91,6 +91,25 @@ func update(_delta: float) -> void:
 	
 	#Variable for calculations when getting out of falling state like slope boost or fall damage
 	fall_speed = player.velocity.y
+	
+	# Wall Jump
+	if player.is_on_wall() and Input.is_action_just_pressed("Jump"):
+		printt("WallJump...", player.velocity)
+		#player.velocity *= Vector3(-player.get_wall_normal().x, 1, -player.get_wall_normal().z)
+		var real_h_velo = Vector3(player.get_real_velocity().x, 0.0, player.get_real_velocity().z)
+		var wall_jump_dir := player.get_wall_normal()
+		#var wall_jump_dir := (real_h_velo + player.get_wall_normal() * player.wall_jump_velocity).normalized()
+		# These two lines tries to replicate Deadlock's Wall Jump
+		# First it checks if the player is holding a direction against the wall
+		if horizontal_input.dot(player.get_wall_normal()) > 0.0:
+			# Then the direction which speed will be added will be between
+			# the direction of the normal predicted wall jump and the input direction
+			wall_jump_dir = (wall_jump_dir + horizontal_input).normalized()
+		printt(player.get_wall_normal(), wall_jump_dir, player.velocity)
+		#player.velocity = player.velocity.bounce(player.get_wall_normal())
+		player.add_speed_to_direction(wall_jump_dir.normalized(), player.wall_jump_velocity, player.wall_jump_y_velocity)
+		player.velocity.y = player.wall_jump_y_velocity
+		printt("WallJump!", player.velocity)
 
 func exit() -> void:
 	#if player.sakurai_jump: player.gravity = player.sakurai_gravity

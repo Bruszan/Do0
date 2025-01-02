@@ -4,57 +4,70 @@ class_name Player extends CharacterBody3D
 @onready var _gobot = $PlayerPivot/GobotSkin
 @onready var _skeleton = $PlayerPivot/GobotSkin/gobot/Armature/Skeleton3D
 @onready var _camera_pivot = $CameraTwist
-@onready var _camera_pitch = $CameraTwist/CameraPitch
+@onready var _camera_pitch = $CameraTwist
+@onready var _camera = $CameraTwist/SpringArm3D/Camera3D
 
 @onready var _wall_raycast = $PlayerPivot/WallRayCast3D
 @onready var _hand_raycast = $PlayerPivot/HandRayCast3D
 
-@onready var _water_detector = $PlayerPivot/WaterDetection
+@onready var _water_detector = $WaterDetection
 # This enum lists all the possible states the character can be in.
 enum States {IDLE, RUNNING, JUMPING, FALLING, WALLING, EDGING}
 
 # This variable keeps track of the character's current state.
 var state: States = States.IDLE
 
-#Ground movement parameters
-@export var ground_top_speed := 10.0
-@export var ground_accel := 200.0
-@export var ground_decel := 2000.0
-@export var ground_friction := 100.0
-#Air parameters
-@export var air_accel := 10.0
+var temp_velocity := Vector3.ZERO
+@export var rotate_speed := 40.0
+var velocity_dir := 0.0
 
+@export_group("Ground Movement Parameters")
+@export var ground_top_speed := 30.0
+@export var ground_accel := 80.0
+@export var ground_decel := 160.0
+@export var ground_friction := 80.0
+
+@export_group("Jump Parameters")
+
+@export var jump_height := 7.2
+@export var jump_time_to_peak := 0.39
+@export var jump_time_to_descent := 0.43
+
+## The jump presented in Kirby Super Star and Smash Ultimate
+## See Sakurai's video on Jump mechanics to know more
 @export var sakurai_jump := false
 @export var sakurai_jump_velocity := 24.0
 @export var sakurai_jump_duration := 0.2
 @export var sakurai_jump_gravity := 120.0
 @export var sakurai_gravity := 80.0
 
-@export var jump_height := 7.2
-@export var jump_time_to_peak := 0.39
-@export var jump_time_to_descent := 0.43
+@export_group("Air Movement Parameters")
+@export var air_accel := ground_accel
 ##Deceleration in the air if there is no input
-@export var smash_air_decel := false
-@export var air_decel := 10.0
+@export var has_air_friction := false
+@export var air_friction := 10.0
 
 @onready var jump_velocity := (jump_height * 2.0) / jump_time_to_peak
 @onready var jump_gravity := (jump_height * -2.0) / pow(jump_time_to_peak, 2)
 @onready var fall_gravity := (jump_height * -2.0) / pow(jump_time_to_descent, 2)
-#Ground slide parameters
+
+@export_group("Slide Parameters")
 @export var fall_to_slope_factor := 2.0
 #@export var jump_slope_velocity := 50.0
 @export var slope_factor := 50.0
-@export var slide_boost := 5
-@export var slide_friction := 50.0
-@export var drift_turn_speed := 50.0
-#Wall Slide parameters
+@export var slide_boost := 10.0
+@export var slide_friction := 2.0
+@export var drift_turn_factor := 1.2
+
+@export_group("Wall Jump Parameters")
 @export var wall_fall_gravity := 10.0
 @export var wall_jump_y_velocity := 8.0
 @export var wall_jump_velocity := 10.0
-#Dive parameters
+
+@export_group("Swimming Parameters")
 @export var swim_speed := 10.0
 @export var swim_friction := 100.0
-@export var swim_turn := 15.0
+@export var swim_rot_turn := 2.0
 
 @onready var horizontal_velocity := Vector3(velocity.x, 0, velocity.z)
 
@@ -75,9 +88,26 @@ var gravity := jump_gravity
 
 func _ready():
 	_hand_raycast.set_process(false)
+	print("fatherson")
 	
-func _physics_process(delta):
+func _process(delta):
 	pass
+
+func get_horizontal_input() -> Vector3:
+	var raw_input = Input.get_vector("Left", "Right", "Forward", "Back", 0.1)
+	return -Vector3(raw_input.x, 0, raw_input.y).rotated(Vector3.UP, _camera_pivot.rotation.y)
+
+func _get_camera_oriented_input() -> Vector3:
+	var raw_input = Input.get_vector("Left", "Right", "Forward", "Back", 0.1)
+
+	var input := Vector3.ZERO
+	# This is to ensure that diagonal input isn't stronger than axis aligned input
+	input.x = -raw_input.x * sqrt(1.0 - raw_input.y * raw_input.y / 2.0)
+	input.z = -raw_input.y * sqrt(1.0 - raw_input.x * raw_input.x / 2.0)
+
+	input = _camera_pivot.global_transform.basis * input
+	input.y = 0.0
+	return input
 
 func get_horizontal_velocity() -> Vector3:
 	return Vector3(velocity.x, 0, velocity.z)
@@ -90,20 +120,29 @@ func add_horizontal_speed(speed: float) -> void:
 	var speedz = velocity.z + velocity.z / get_horizontal_speed() * speed
 	velocity = Vector3(speedx, velocity.y, speedz)
 	
-func set_speed_to_direction(xspeed: float, h_direction: Vector3, yspeed: float) -> void:
+func set_speed_to_direction(h_direction: Vector3, xspeed: float, yspeed: float) -> void:
 	velocity = Vector3(h_direction.x * xspeed, yspeed, h_direction.z * xspeed)
+func add_speed_to_direction(h_direction: Vector3, xspeed: float, yspeed: float) -> void:
+	velocity = get_real_velocity() + Vector3(h_direction.x * xspeed, yspeed, h_direction.z * xspeed)
 
-func _process(delta):
+#func cap_horizontal_speed(speed_cap: float) -> void:
+	#var cappedx = velocity.x / get_horizontal_speed() * speed_cap
+	#var cappedz = velocity.z / get_horizontal_speed() * speed_cap
+	#velocity = Vector3(cappedx, velocity.y, cappedz)
+	
+func _physics_process(delta):
+	Global.debug.add_debug_property("Velocity", velocity, 1)
+	Global.debug.add_debug_property("Speed", Vector3(velocity.x, 0, velocity.z).length(), 1)
 	# Add the gravity.
-	if not is_on_floor() and get_motion_mode() == MotionMode.MOTION_MODE_GROUNDED:
+	if not is_on_floor() and not Global.on_water:
 		velocity.y -= gravity * delta
 
 	move_and_slide()
 	#Rotate the player to its velocity direction
 	if get_horizontal_velocity():
-		var velocity_dir = atan2(velocity.x, velocity.z)
-		_player_pivot.rotation.y = lerp_angle(_player_pivot.rotation.y, velocity_dir, 30*delta)
-
+		velocity_dir = atan2(velocity.x, velocity.z)
+	if velocity_dir != _player_pivot.rotation.y:
+		_player_pivot.rotation.y = lerp_angle(_player_pivot.rotation.y, velocity_dir, rotate_speed*delta)
 	##Old script below
 	
 	#Enters camera's shoot mode when shooting, like in Risk of Rain 2
@@ -153,6 +192,13 @@ func _process(delta):
 		#print($Head.rotation.y, "  ", _player_pivot.rotation.y)
 
 func _unhandled_input(event):
+	#if Input.is_action_just_pressed("Pause"): 
+		#Global.paused = not Global.paused
+		#if Global.paused: 
+			#temp_velocity = velocity
+			#velocity = Vector3.ZERO
+		#else: velocity = temp_velocity
+		
 	if Input.is_action_just_pressed("Reset"):
 		position = Vector3.ZERO
 	
@@ -192,7 +238,9 @@ func _unhandled_input(event):
 		
 	#if Input.is_action_just_pressed("Left"): #Test deadzone not working
 		#print(Input.get_action_strength("Left"))
-
+	
+	if Input.is_action_pressed("Lock"): Global.locked = true
+	else: Global.locked = false
 
 func _on_water_detection_area_entered(area):
 	Global.on_water = true

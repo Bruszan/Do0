@@ -17,9 +17,9 @@ func enter(previous_state_path: String, data := {}) -> void:
 	var wall_angle = atan2(player._wall_raycast.get_collision_normal().x, player._wall_raycast.get_collision_normal().z)
 	player._player_pivot.rotate_y(player._player_pivot.rotation.angle_to(player._wall_raycast.get_collision_normal()) - PI/2)  
 
-func update(_delta: float) -> void:
+func physics_update(_delta: float) -> void:
 	var input_dir = Input.get_vector("Left", "Right", "Forward", "Back", 0.1)
-	var horizontal_input = Vector3(input_dir.x, 0, input_dir.y).rotated(Vector3.UP, player._camera_pivot.rotation.y)
+	var horizontal_input = player.get_horizontal_input()
 	
 	#printt(horizontal_input.dot(-player._wall_raycast.get_collision_normal()), horizontal_input, -player._wall_raycast.get_collision_normal())
 	if horizontal_input.dot(player._wall_raycast.get_collision_normal()) > 0.0:
@@ -33,7 +33,7 @@ func update(_delta: float) -> void:
 		
 	if Input.is_action_just_pressed("Jump"):
 		print(aim_direction)
-		player.set_speed_to_direction(player.wall_jump_velocity, aim_direction, player.wall_jump_y_velocity)
+		player.set_speed_to_direction(aim_direction, player.wall_jump_velocity, player.wall_jump_y_velocity)
 		finished.emit(JUMPING)
 	elif Input.is_action_pressed("Slide"):
 		finished.emit(FALLING)

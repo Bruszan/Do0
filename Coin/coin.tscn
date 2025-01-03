@@ -1,14 +1,10 @@
 [gd_scene load_steps=5 format=3 uid="uid://kpp8mxcmg1sf"]
 
 [ext_resource type="Script" path="res://Coin/Coin.gd" id="1_wm1kk"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jpit8"]
-albedo_color = Color(1, 1, 0, 1)
-metallic = 1.0
-roughness = 0.25
+[ext_resource type="Material" uid="uid://dx4io5k4x5di1" path="res://assets/materials/coin.tres" id="2_xkx7u"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_tm88d"]
-material = SubResource("StandardMaterial3D_jpit8")
+material = ExtResource("2_xkx7u")
 height = 0.2
 
 [sub_resource type="SphereShape3D" id="SphereShape3D_we5y1"]

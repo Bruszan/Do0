@@ -57,7 +57,7 @@ seamless = true
 as_normal_map = true
 noise = SubResource("FastNoiseLite_35mbd")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_ud3mn"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_0rb3k"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("8_mvkne")
@@ -76,9 +76,9 @@ shader_parameter/refraction_strength = 0.5
 shader_parameter/normalmap_a = SubResource("NoiseTexture2D_xq444")
 shader_parameter/normalmap_b = SubResource("NoiseTexture2D_6glte")
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_mmr7d"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_66wvi"]
 resource_local_to_scene = true
-material = SubResource("ShaderMaterial_ud3mn")
+material = SubResource("ShaderMaterial_0rb3k")
 size = Vector2(500, 500)
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_6bghr"]
@@ -133,7 +133,7 @@ size = Vector3(20, 20, 20)
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_tekfg"]
 data = PackedVector3Array(-10, 10, 10, 10, -10, 10, -10, -10, 10, -10, 10, -10, -10, -10, -10, 10, -10, -10, -10, 10, 10, -10, 10, -10, 10, -10, 10, -10, 10, -10, 10, -10, -10, 10, -10, 10, -10, 10, -10, -10, 10, 10, -10, -10, -10, -10, 10, 10, -10, -10, 10, -10, -10, -10, -10, -10, 10, 10, -10, 10, -10, -10, -10, 10, -10, 10, 10, -10, -10, -10, -10, -10)
 
-[node name="Cena" type="Node3D"]
+[node name="Debug_Island" type="Node3D"]
 process_mode = 1
 
 [node name="Entities" type="Node" parent="."]
@@ -180,7 +180,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.15858, -3)
 
 [node name="WaterPlane" parent="." instance=ExtResource("7_v1xal")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
-mesh = SubResource("PlaneMesh_mmr7d")
+mesh = SubResource("PlaneMesh_66wvi")
 
 [node name="Objects" type="Node3D" parent="."]
 

@@ -26,6 +26,8 @@ var velocity_dir := 0.0
 @export var ground_accel := 80.0
 @export var ground_decel := 160.0
 @export var ground_friction := 80.0
+## Speed is reduced by this value per second when over the top ground speed
+@export var overspeed_decel := 30
 
 @export_group("Jump Parameters")
 
@@ -33,11 +35,11 @@ var velocity_dir := 0.0
 @export var jump_time_to_peak := 0.39
 @export var jump_time_to_descent := 0.43
 
-## The jump presented in Kirby Super Star and Smash Ultimate
-## See Sakurai's video on Jump mechanics to know more
+## The jump presented in Sakurai's games. See his video on Jump mechanics to know more
 @export var sakurai_jump := false
 @export var sakurai_jump_velocity := 24.0
-@export var sakurai_jump_duration := 0.2
+## The default is the same as Smash Ultimate
+@export var sakurai_jump_duration := (1.0 / 60.0) * 4.0
 @export var sakurai_jump_gravity := 120.0
 @export var sakurai_gravity := 80.0
 
@@ -201,6 +203,7 @@ func _unhandled_input(event):
 		
 	if Input.is_action_just_pressed("Reset"):
 		position = Vector3.ZERO
+		velocity = Vector3.ZERO
 	
 	if event is InputEventMouseMotion:
 		if Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:

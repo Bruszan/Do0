@@ -7,7 +7,7 @@ extends Node3D
 @export_range(0.0, 1.0) var auto_sensitivity := 0.05
 @export var tilt_upper_limit := PI / 2.0
 @export var tilt_lower_limit := -PI / 2.0
-@export var initial_distance := 6.0
+@export var initial_length := 5.0
 @export var initial_height := 2.0
 @export var lock_distance := 4.0
 @export var lock_height := 3.0
@@ -19,7 +19,7 @@ var _camera_input_direction := Vector2.ZERO
 
 func _ready():
 	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
-	_camera_arm.spring_length = initial_distance
+	_camera_arm.spring_length = initial_length
 	position.y = initial_height
 
 func _input(event: InputEvent) -> void:
@@ -61,5 +61,5 @@ func _process(delta: float) -> void:
 		CameraTween.tween_property(self, "position:y", lock_height, 1)
 	else:
 		var CameraTween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
-		CameraTween.tween_property(_camera_arm, "spring_length", initial_distance, 1)
+		CameraTween.tween_property(_camera_arm, "spring_length", initial_length, 1)
 		CameraTween.tween_property(self, "position:y", initial_height, 1)

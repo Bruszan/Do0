@@ -12,7 +12,7 @@ config_version=5
 
 config/name="Do 0"
 config/tags=PackedStringArray("3d", "platformer")
-run/main_scene="res://cena.tscn"
+run/main_scene="res://debug_island.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 run/max_fps=60
 config/icon="res://icon.svg"

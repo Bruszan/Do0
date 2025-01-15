@@ -1,9 +1,14 @@
 extends PlayerState
 
 var h := Vector3.ZERO
+var accel_stable := 0.0
 
 func get_horizontal_speed() -> float:
 	return Vector3(player.velocity.x, 0, player.velocity.z).length()
+
+func enter(previous_state_path: String, data := {}) -> void:
+	if player.use_base_speed and previous_state_path == "IDLE": 
+		player.velocity = player.get_horizontal_input().normalized() * player.base_speed
 
 func physics_update(_delta: float) -> void:
 	var horizontal_input = player.get_horizontal_input()
@@ -34,15 +39,14 @@ func physics_update(_delta: float) -> void:
 			#h = horizontal_input * horizontal_speed
 		
 		if horizontal_input.dot(player.velocity) <= 0.0:
-			# player is trying to move away
+			# player is trying to move away from velocity
 			#print("desacelera   ", player.velocity.move_toward(Vector3(h.x, 0, h.z), _delta).length())
 			player.velocity = player.velocity.move_toward(Vector3(h.x, player.velocity.y, h.z), player.ground_decel * _delta)
 		else:
 			# player is moving toward velocity
-			player.velocity = player.velocity.move_toward(Vector3(h.x, player.velocity.y, h.z), player.ground_accel * _delta) 
+			player.velocity = player.velocity.move_toward(Vector3(h.x, player.velocity.y, h.z), player.ground_accel * _delta)
 	else:
 		player.velocity = player.velocity.move_toward(Vector3(0, player.velocity.y, 0), player.ground_friction * _delta)
-		
 	
 	
 	if Input.is_action_just_pressed("Jump"):
@@ -51,7 +55,7 @@ func physics_update(_delta: float) -> void:
 		finished.emit(SLIDING)
 	elif not player.is_on_floor():
 		finished.emit(FALLING)
-	elif player.velocity == Vector3.ZERO and not Global.paused:
+	elif player.velocity == Vector3.ZERO:
 		finished.emit(IDLE)
 	elif Global.on_water:
 		finished.emit(DIVING)

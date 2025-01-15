@@ -1,4 +1,4 @@
-[gd_scene load_steps=35 format=3 uid="uid://bl3w81m6ok38y"]
+[gd_scene load_steps=34 format=3 uid="uid://bl3w81m6ok38y"]
 
 [ext_resource type="PackedScene" uid="uid://b2k886kn8sd2y" path="res://Player/player.tscn" id="1_dnmpn"]
 [ext_resource type="Texture2D" uid="uid://d1xe0rax0mi8x" path="res://assets/textures/kenney_prototype-textures/Dark/texture_01.png" id="1_elnlr"]
@@ -11,7 +11,6 @@
 [ext_resource type="Shader" path="res://Shaders/water2o.gdshader" id="8_mvkne"]
 [ext_resource type="PackedScene" uid="uid://6fp4j4y37vhd" path="res://Debug/debug.tscn" id="9_h3p6m"]
 [ext_resource type="PackedScene" uid="uid://d30v3c2c5im1d" path="res://GUI/pause.tscn" id="10_n1plg"]
-[ext_resource type="PackedScene" uid="uid://baomrlkbvbdkb" path="res://GUI/hud.tscn" id="12_i4ssu"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g6nn0"]
 albedo_texture = ExtResource("1_elnlr")
@@ -59,7 +58,7 @@ seamless = true
 as_normal_map = true
 noise = SubResource("FastNoiseLite_35mbd")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_nxx0m"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_g6gm1"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("8_mvkne")
@@ -78,9 +77,9 @@ shader_parameter/refraction_strength = 0.5
 shader_parameter/normalmap_a = SubResource("NoiseTexture2D_xq444")
 shader_parameter/normalmap_b = SubResource("NoiseTexture2D_6glte")
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_8ciao"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_gstut"]
 resource_local_to_scene = true
-material = SubResource("ShaderMaterial_nxx0m")
+material = SubResource("ShaderMaterial_g6gm1")
 size = Vector2(500, 500)
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_6bghr"]
@@ -144,8 +143,9 @@ process_mode = 1
 
 [node name="Eu" parent="Entities" instance=ExtResource("1_dnmpn")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.53674e-07, 0)
-use_base_accel = false
-base_accel = null
+ground_top_speed = 20.0
+ground_accel = 100.0
+ground_friction = 100.0
 wall_jump_y_velocity = 40.0
 swim_friction = 70.0
 swim_rot_turn = 6.0
@@ -174,33 +174,26 @@ directional_shadow_mode = 1
 
 [node name="Coins" type="Node3D" parent="."]
 
-[node name="Coin1" parent="Coins" node_paths=PackedStringArray("hud") instance=ExtResource("4_a0rvu")]
+[node name="Coin1" parent="Coins" instance=ExtResource("4_a0rvu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, -3)
-hud = NodePath("../../GUI/HUD")
 
-[node name="Coin2" parent="Coins" node_paths=PackedStringArray("hud") instance=ExtResource("4_a0rvu")]
+[node name="Coin2" parent="Coins" instance=ExtResource("4_a0rvu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 2, -3)
-hud = NodePath("../../GUI/HUD")
 
-[node name="Coin3" parent="Coins" node_paths=PackedStringArray("hud") instance=ExtResource("4_a0rvu")]
+[node name="Coin3" parent="Coins" instance=ExtResource("4_a0rvu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6, 2, -3)
-hud = NodePath("../../GUI/HUD")
 
-[node name="Coin4" parent="Coins" node_paths=PackedStringArray("hud") instance=ExtResource("4_a0rvu")]
+[node name="Coin4" parent="Coins" instance=ExtResource("4_a0rvu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9, 2, -3)
-hud = NodePath("../../GUI/HUD")
 
-[node name="Coin5" parent="Coins" node_paths=PackedStringArray("hud") instance=ExtResource("4_a0rvu")]
+[node name="Coin5" parent="Coins" instance=ExtResource("4_a0rvu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 2, -3)
-hud = NodePath("../../GUI/HUD")
 
-[node name="Coin6" parent="Coins" node_paths=PackedStringArray("hud") instance=ExtResource("4_a0rvu")]
+[node name="Coin6" parent="Coins" instance=ExtResource("4_a0rvu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6, 2, -3)
-hud = NodePath("../../GUI/HUD")
 
-[node name="Coin7" parent="Coins" node_paths=PackedStringArray("hud") instance=ExtResource("4_a0rvu")]
+[node name="Coin7" parent="Coins" instance=ExtResource("4_a0rvu")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 2, -3)
-hud = NodePath("../../GUI/HUD")
 
 [node name="Sprite3D" type="Sprite3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
@@ -210,7 +203,7 @@ script = ExtResource("3_sgm8a")
 
 [node name="WaterPlane" parent="." instance=ExtResource("7_v1xal")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
-mesh = SubResource("PlaneMesh_8ciao")
+mesh = SubResource("PlaneMesh_gstut")
 
 [node name="Objects" type="Node3D" parent="."]
 
@@ -274,8 +267,6 @@ layout_mode = 1
 
 [node name="Pause" parent="GUI" instance=ExtResource("10_n1plg")]
 layout_mode = 1
-
-[node name="HUD" parent="GUI" instance=ExtResource("12_i4ssu")]
 
 [node name="CSGPolygon3D" type="CSGPolygon3D" parent="."]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -40, 0, -40)

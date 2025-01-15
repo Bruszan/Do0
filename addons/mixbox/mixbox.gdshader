@@ -1,24 +1,24 @@
 // ==========================================================
-//  MIXBOX 2.0 (c) 2022 Secret Weapons. All rights reserved. 
-//  License: Creative Commons Attribution-NonCommercial 4.0  
-//  Authors: Sarka Sochorova and Ondrej Jamriska             
+//  MIXBOX 2.0 (c) 2022 Secret Weapons. All rights reserved.
+//  License: Creative Commons Attribution-NonCommercial 4.0
+//  Authors: Sarka Sochorova and Ondrej Jamriska
 // ==========================================================
 //
 //   BASIC USAGE
 //
 //      vec3 rgb = mixbox_lerp(rgb1, rgb2, t);
-// 
+//
 //   MULTI-COLOR MIXING
 //
 //      mat3 z1 = mixbox_rgb_to_latent(rgb1);
 //      mat3 z2 = mixbox_rgb_to_latent(rgb2);
 //      mat3 z3 = mixbox_rgb_to_latent(rgb3);
-// 
+//
 //      // mix 30% of rgb1, 60% of rgb2, and 10% of rgb3
 //      mat3 z_mix = 0.3*z1 + 0.6*z2 + 0.1*z3;
-// 
+//
 //      vec3 rgb_mix = mixbox_latent_to_rgb(z_mix);
-// 
+//
 //   PIGMENT COLORS
 //
 //      Cadmium Yellow              0.996, 0.925, 0.000
@@ -34,12 +34,12 @@
 //      Permanent Green             0.027, 0.427, 0.086
 //      Sap Green                   0.420, 0.580, 0.016
 //      Burnt Sienna                0.482, 0.282, 0.000
-// 
+//
 //   LICENSING
 //
 //      If you want to obtain commercial license, please
 //      contact us at: mixbox@scrtwpns.com
-// 
+//
 
 shader_type canvas_item;
 

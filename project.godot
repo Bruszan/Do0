@@ -14,7 +14,6 @@ config/name="Do 0"
 config/tags=PackedStringArray("3d", "platformer")
 run/main_scene="res://debug_island.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
-run/max_fps=60
 config/icon="res://icon.svg"
 
 [autoload]
@@ -153,3 +152,4 @@ textures/canvas_textures/default_texture_repeat=1
 textures/lossless_compression/force_png=true
 textures/default_filters/use_nearest_mipmap_filter=true
 textures/default_filters/anisotropic_filtering_level=3
+anti_aliasing/quality/msaa_3d=3

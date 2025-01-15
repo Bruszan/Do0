@@ -2,7 +2,6 @@ extends PlayerState
 
 func enter(previous_state_path: String, data := {}) -> void:
 	player._gobot.idle()
-	printt("idle")
 
 func physics_update(_delta: float) -> void:
 	player.velocity = player.velocity.move_toward(Vector3.ZERO, player.ground_friction)

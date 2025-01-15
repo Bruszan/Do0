@@ -1,0 +1,20 @@
+[gd_scene format=3 uid="uid://baomrlkbvbdkb"]
+
+[node name="HUD" type="CanvasLayer"]
+
+[node name="Panel" type="Panel" parent="."]
+offset_right = 100.0
+offset_bottom = 50.0
+
+[node name="Label" type="Label" parent="."]
+anchors_preset = -1
+anchor_left = 0.043
+anchor_top = 0.038
+anchor_right = 0.043
+anchor_bottom = 0.038
+offset_left = -25.536
+offset_top = -15.624
+offset_right = 24.464
+offset_bottom = 14.376
+grow_horizontal = 2
+grow_vertical = 2

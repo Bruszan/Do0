@@ -19,13 +19,27 @@ var state: States = States.IDLE
 
 var temp_velocity := Vector3.ZERO
 @export var rotate_speed := 40.0
-var velocity_dir := 0.0
+var rotation_ang := 0.0
+@export var rotation_dir := Rotation_Dir.VELOCITY
+enum Rotation_Dir {
+	VELOCITY,
+	INPUT,
+	VELOCINPUT,
+}
 
 @export_group("Ground Movement Parameters")
 @export var ground_top_speed := 30.0
-@export var ground_accel := 80.0
-@export var ground_decel := 160.0
-@export var ground_friction := 80.0
+@export var use_base_speed := false
+@export var base_speed := 10.0 if use_base_speed else 0.0
+@export var use_base_accel := false
+@export var base_accel := 5.0 if use_base_accel else 0.0
+#@export var ground_accel := 0.2
+@export var time_to_top_speed := 0.5
+@onready var ground_accel := (ground_top_speed - base_speed) / time_to_top_speed
+@export var time_to_stop := 0.5
+@onready var ground_friction := ground_top_speed / time_to_stop
+@export var time_to_brake := 0.1
+@onready var ground_decel := ground_top_speed / time_to_stop
 ## Speed is reduced by this value per second when over the top ground speed
 @export var overspeed_decel := 30
 
@@ -35,23 +49,22 @@ var velocity_dir := 0.0
 @export var jump_time_to_peak := 0.39
 @export var jump_time_to_descent := 0.43
 
-## The jump presented in Sakurai's games. See his video on Jump mechanics to know more
-@export var sakurai_jump := false
-@export var sakurai_jump_velocity := 24.0
-## The default is the same as Smash Ultimate
-@export var sakurai_jump_duration := (1.0 / 60.0) * 4.0
-@export var sakurai_jump_gravity := 120.0
-@export var sakurai_gravity := 80.0
-
-@export_group("Air Movement Parameters")
-@export var air_accel := ground_accel
-##Deceleration in the air if there is no input
-@export var has_air_friction := false
-@export var air_friction := 10.0
-
 @onready var jump_velocity := (jump_height * 2.0) / jump_time_to_peak
 @onready var jump_gravity := (jump_height * -2.0) / pow(jump_time_to_peak, 2)
 @onready var fall_gravity := (jump_height * -2.0) / pow(jump_time_to_descent, 2)
+
+## The jump presented in Sakurai's games. See his video on Jump mechanics to know more
+@export var sakurai_jump := false
+## The default is the same as Smash Ultimate
+@export var sakurai_initial_jump_duration := (1.0 / 60.0) * 4.0
+@export var sakurai_initial_jump_height := 5.0
+@export var sakurai_jump_height := 8.0
+
+@export_group("Air Movement Parameters")
+@export var air_accel := 28.0
+##Deceleration in the air if there is no input
+@export var has_air_friction := false
+@export var air_friction := 10.0
 
 @export_group("Slide Parameters")
 @export var fall_to_slope_factor := 2.0
@@ -133,6 +146,8 @@ func add_speed_to_direction(h_direction: Vector3, xspeed: float, yspeed: float) 
 	#velocity = Vector3(cappedx, velocity.y, cappedz)
 	
 func _physics_process(delta):
+	Global.debug.add_debug_property("FPS", Engine.get_frames_per_second(), 1)
+	Global.debug.add_debug_property("Input", get_horizontal_input(), 1)
 	Global.debug.add_debug_property("Velocity", velocity, 1)
 	Global.debug.add_debug_property("Speed", Vector3(velocity.x, 0, velocity.z).length(), 1)
 	# Add the gravity.
@@ -140,11 +155,25 @@ func _physics_process(delta):
 		velocity.y -= gravity * delta
 
 	move_and_slide()
-	#Rotate the player to its velocity direction
-	if get_horizontal_velocity():
-		velocity_dir = atan2(velocity.x, velocity.z)
-	if velocity_dir != _player_pivot.rotation.y:
-		_player_pivot.rotation.y = lerp_angle(_player_pivot.rotation.y, velocity_dir, rotate_speed*delta)
+	#Rotate the player to its velocity directionrotation_dir == Rotation_Dir.INPUT:
+	if rotation_dir == Rotation_Dir.INPUT:
+		var input_dir = get_horizontal_input()
+		if get_horizontal_input():
+			rotation_ang = atan2(input_dir.x, input_dir.z)
+		elif get_horizontal_velocity(): rotation_ang = atan2(velocity.x, velocity.z)
+	elif rotation_dir == Rotation_Dir.VELOCITY:
+		if get_horizontal_velocity():
+			rotation_ang = atan2(velocity.x, velocity.z)
+	elif rotation_dir == Rotation_Dir.VELOCINPUT:
+		var input_dir = get_horizontal_input()
+		if input_dir and get_horizontal_velocity():
+			var cross_vec = input_dir.cross(get_horizontal_velocity()).normalized()
+			rotation_ang = atan2(cross_vec.x, cross_vec.z)
+		elif get_horizontal_input(): rotation_ang = atan2(input_dir.x, input_dir.z)
+		elif get_horizontal_velocity(): rotation_ang = atan2(velocity.x, velocity.z)
+			
+	if rotation_ang != _player_pivot.rotation.y:
+		_player_pivot.rotation.y = lerp_angle(_player_pivot.rotation.y, rotation_ang, rotate_speed * delta)
 	##Old script below
 	
 	#Enters camera's shoot mode when shooting, like in Risk of Rain 2
@@ -221,18 +250,18 @@ func _unhandled_input(event):
 	if Input.is_action_pressed("Shoot"): shoot_mode = true
 		
 	#Reset camera to the direction the player is facing
-	if Input.is_action_pressed("Reset_Camera"):
-		_camera_pivot.rotation.x = lerp_angle(_camera_pivot.rotation.x,
-															deg_to_rad(-10),
-															20 * get_process_delta_time())
-		if direction: #If the player is holding a direction it will rotate to that direction
-			ang_base = atan2(direction.x, direction.z) 
-		else: #If not holding any direction, the camera will reset to the player's direction
-			ang_base = _player_pivot.rotation.y
-		
-		_camera_pivot.target_rotation = ang_base - PI
-		
-		print(_camera_pivot.target_rotation)
+	#if Input.is_action_pressed("Reset_Camera"):
+		#_camera_pivot.rotation.x = lerp_angle(_camera_pivot.rotation.x,
+															#deg_to_rad(-10),
+															#20 * get_process_delta_time())
+		#if direction: #If the player is holding a direction it will rotate to that direction
+			#ang_base = atan2(direction.x, direction.z) 
+		#else: #If not holding any direction, the camera will reset to the player's direction
+			#ang_base = _player_pivot.rotation.y
+		#
+		#_camera_pivot.target_rotation = ang_base - PI
+		#
+		#print(_camera_pivot.target_rotation)
 		
 		#var CameraTween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
 		#CameraTween.tween_property($Camera_Twist, "rotation:y", target_rotation, 1)

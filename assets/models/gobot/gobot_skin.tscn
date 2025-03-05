@@ -1,7 +1,7 @@
 [gd_scene load_steps=92 format=3 uid="uid://cy36aygvs66pn"]
 
 [ext_resource type="PackedScene" uid="uid://kod0awm1ha4o" path="res://assets/models/gobot/model/gobot.glb" id="1_qg1mb"]
-[ext_resource type="Script" path="res://assets/models/gobot/gobot_skin.gd" id="1_rwke8"]
+[ext_resource type="Script" uid="uid://b8sw54pq5wjak" path="res://assets/models/gobot/gobot_skin.gd" id="1_rwke8"]
 [ext_resource type="Texture2D" uid="uid://dq675fmt1rg8c" path="res://assets/models/gobot/textures/open_eye.png" id="3_aysq5"]
 [ext_resource type="Texture2D" uid="uid://cfdf62ci74tew" path="res://assets/models/gobot/textures/closed_eyes.png" id="3_yxlpa"]
 [ext_resource type="Material" uid="uid://div0enqs04w5j" path="res://assets/models/gobot/materials/eye_mat.tres" id="4_p2r8e"]
@@ -3673,22 +3673,22 @@ tracks/28/keys = PackedFloat32Array(0, 1, 0.0298192, -0.0194152, -0.000472976, 0
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_03he3"]
 _data = {
-"EdgeAim": SubResource("Animation_448ym"),
-"EdgeGrab": SubResource("Animation_o2ond"),
-"Fall": SubResource("Animation_ra5uo"),
-"Flip": SubResource("Animation_m4elg"),
-"Float": SubResource("Animation_eu8ut"),
-"Idle": SubResource("Animation_80s3p"),
-"Jump": SubResource("Animation_hoyaw"),
-"JumpFlip": SubResource("Animation_7sw20"),
-"RESET": SubResource("Animation_c7pi5"),
-"Run": SubResource("Animation_5nggx"),
-"Slide": SubResource("Animation_6y7jp"),
-"Slide_Right": SubResource("Animation_bllnj"),
-"Swim": SubResource("Animation_agcta"),
-"VictorySign": SubResource("Animation_vrhq2"),
-"Walk": SubResource("Animation_eg26g"),
-"WallSlide": SubResource("Animation_pii0g")
+&"EdgeAim": SubResource("Animation_448ym"),
+&"EdgeGrab": SubResource("Animation_o2ond"),
+&"Fall": SubResource("Animation_ra5uo"),
+&"Flip": SubResource("Animation_m4elg"),
+&"Float": SubResource("Animation_eu8ut"),
+&"Idle": SubResource("Animation_80s3p"),
+&"Jump": SubResource("Animation_hoyaw"),
+&"JumpFlip": SubResource("Animation_7sw20"),
+&"RESET": SubResource("Animation_c7pi5"),
+&"Run": SubResource("Animation_5nggx"),
+&"Slide": SubResource("Animation_6y7jp"),
+&"Slide_Right": SubResource("Animation_bllnj"),
+&"Swim": SubResource("Animation_agcta"),
+&"VictorySign": SubResource("Animation_vrhq2"),
+&"Walk": SubResource("Animation_eg26g"),
+&"WallSlide": SubResource("Animation_pii0g")
 }
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_g4wg5"]
@@ -3963,7 +3963,7 @@ bones/0/scale = Vector3(0.999999, 1, 1)
 bones/1/position = Vector3(-0.0694287, 0.134651, -0.0624404)
 bones/1/rotation = Quaternion(0.679368, -0.310085, 0.392234, 0.537083)
 bones/1/scale = Vector3(1, 1, 1)
-bones/2/position = Vector3(0, 0.35054, 0)
+bones/2/position = Vector3(0, 0.371464, 0)
 bones/2/rotation = Quaternion(-0.201467, -0.392991, -0.35358, 0.824591)
 bones/4/rotation = Quaternion(-0.734245, -0.267929, -0.530202, 0.328609)
 bones/5/rotation = Quaternion(0.859052, 5.88875e-07, -2.93312e-05, 0.511888)
@@ -4004,15 +4004,29 @@ bones/24/position = Vector3(0, 0.189977, 0)
 bones/24/rotation = Quaternion(0.0452861, -0.446931, 0.0231192, 0.893122)
 bones/24/scale = Vector3(0.750475, 0.750475, 0.750475)
 
-[node name="Gobot" parent="gobot/Armature/Skeleton3D" index="0"]
+[node name="LookAtModifier3D" type="LookAtModifier3D" parent="gobot/Armature/Skeleton3D" index="0"]
+bone_name = "Hips"
+bone = 3
+origin_offset = Vector3(0, -0.5, 0)
+duration = 0.5
+transition_type = 5
+ease_type = 2
+use_angle_limitation = true
+symmetry_limitation = true
+primary_limit_angle = 3.14159
+primary_damp_threshold = 1.0
+secondary_limit_angle = 6.28319
+secondary_damp_threshold = 1.0
+
+[node name="Gobot" parent="gobot/Armature/Skeleton3D" index="1"]
 material_overlay = SubResource("StandardMaterial3D_t4001")
 surface_material_override/1 = SubResource("StandardMaterial3D_f5nav")
 surface_material_override/2 = ExtResource("4_p2r8e")
 
 [node name="AnimationPlayer" parent="gobot" index="1"]
 libraries = {
-"": SubResource("AnimationLibrary_03he3"),
-"custom_lib": ExtResource("6_vjupt")
+&"": SubResource("AnimationLibrary_03he3"),
+&"custom_lib": ExtResource("6_vjupt")
 }
 
 [node name="BlinkTimer" type="Timer" parent="."]

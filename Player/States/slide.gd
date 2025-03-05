@@ -43,7 +43,7 @@ func physics_update(_delta: float) -> void:
 	#Slide script so that it can also be used as a drift to change the player's direction while maintaining speed
 	#Input for the player to drift while sliding
 	var input_dir = Input.get_vector("Left", "Right", "Forward", "Back", 0.1)
-	var horizontal_input = -player._camera_pivot.global_basis.z * input_dir.y + -player._camera_pitch.global_basis.x * input_dir.x
+	var horizontal_input = -player._camera_pivot.global_basis.z * input_dir.y + -player._camera_pivot.global_basis.x * input_dir.x
 	
 	##Rotating the player's velocity for drifting
 	#For rotating the player's velocity to the direction being input like this, the turn speed is dependant on the current velocity
@@ -64,7 +64,7 @@ func physics_update(_delta: float) -> void:
 	##This should be a better way to rotate the player based on the floor normal because it only affects the rotation
 	#player._player_pivot.rotation = Vector3(player.get_floor_normal().x, velocity_dir, player.get_floor_normal().z)
 	##But I don't know how to get the rotation value for x and z yet, so I'm sticking with BornCG's method that affects the entire transform
-	player._player_pivot.global_transform = transform_align_with_floor(player.get_floor_normal())
+	if player.is_on_floor(): player._player_pivot.global_transform = transform_align_with_floor(player.get_floor_normal())
 	
 	if player.velocity == Vector3.ZERO and not Global.paused:
 		finished.emit(IDLE)
@@ -75,7 +75,7 @@ func physics_update(_delta: float) -> void:
 	elif not player.is_on_floor():
 		print(player.velocity.y)
 		player.gravity =- player.fall_gravity
-		finished.emit(FALLING)
+		#finished.emit(FALLING)
 	elif Global.on_water:
 		finished.emit(DIVING)
 		

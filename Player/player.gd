@@ -1,16 +1,17 @@
 class_name Player extends CharacterBody3D
 
-@onready var _player_pivot = $PlayerPivot
-@onready var _gobot = $PlayerPivot/GobotSkin
-@onready var _skeleton = $PlayerPivot/GobotSkin/gobot/Armature/Skeleton3D
-@onready var _camera_pivot = $CameraTwist
-@onready var _camera_pitch = $CameraTwist
-@onready var _camera = $CameraTwist/SpringArm3D/Camera3D
+@onready var _player_pivot := $PlayerPivot
+@onready var _gobot := $PlayerPivot/GobotSkin
+@onready var _skeleton := $PlayerPivot/GobotSkin/gobot/Armature/Skeleton3D
+@onready var _camera_pivot := get_parent().find_child("CameraTwist")
+@onready var _camera := $CameraTwist/SpringArm3D/Camera3D
 
-@onready var _wall_raycast = $PlayerPivot/WallRayCast3D
-@onready var _hand_raycast = $PlayerPivot/HandRayCast3D
+@onready var _direction_target := $DirectionTarget
 
-@onready var _water_detector = $WaterDetection
+@onready var _wall_raycast := $PlayerPivot/WallRayCast3D
+@onready var _hand_raycast := $PlayerPivot/HandRayCast3D
+
+@onready var _water_detector := $WaterDetection
 # This enum lists all the possible states the character can be in.
 enum States {IDLE, RUNNING, JUMPING, FALLING, WALLING, EDGING}
 
@@ -22,24 +23,29 @@ var temp_velocity := Vector3.ZERO
 var rotation_ang := 0.0
 @export var rotation_dir := Rotation_Dir.VELOCITY
 enum Rotation_Dir {
+	NOTHING,
 	VELOCITY,
 	INPUT,
 	VELOCINPUT,
 }
 
 @export_group("Ground Movement Parameters")
-@export var ground_top_speed := 30.0
-@export var use_base_speed := false
-@export var base_speed := 10.0 if use_base_speed else 0.0
+@export var ground_top_speed := 25.0
+## Parameters incase of having initial speed or accel when moving
+@export var base_speed := 10.0
 @export var use_base_accel := false
 @export var base_accel := 5.0 if use_base_accel else 0.0
 #@export var ground_accel := 0.2
-@export var time_to_top_speed := 0.5
-@onready var ground_accel := (ground_top_speed - base_speed) / time_to_top_speed
-@export var time_to_stop := 0.5
-@onready var ground_friction := ground_top_speed / time_to_stop
+#@export var time_to_top_speed := 0.5
+@export var ground_accel := 100.0
+#@onready var ground_accel := (ground_top_speed - base_speed) / time_to_top_speed
+#@export var time_to_stop := 0.5
+@export var ground_friction := 30.0
+#@onready var ground_friction := ground_top_speed / time_to_stop
 @export var time_to_brake := 0.1
-@onready var ground_decel := ground_top_speed / time_to_stop
+## Speed which the player decelerates when going against velocity direction
+@export var ground_decel := 150.0
+#@onready var ground_decel := ground_top_speed / time_to_stop
 ## Speed is reduced by this value per second when over the top ground speed
 @export var overspeed_decel := 30
 
@@ -61,6 +67,7 @@ enum Rotation_Dir {
 @export var sakurai_jump_height := 8.0
 
 @export_group("Air Movement Parameters")
+@export var air_top_speed := 20
 @export var air_accel := 28.0
 ##Deceleration in the air if there is no input
 @export var has_air_friction := false
@@ -75,7 +82,7 @@ enum Rotation_Dir {
 @export var drift_turn_factor := 1.2
 
 @export_group("Wall Jump Parameters")
-@export var wall_fall_gravity := 10.0
+@export var wall_friction := 10.0
 @export var wall_jump_y_velocity := 8.0
 @export var wall_jump_velocity := 10.0
 
@@ -97,15 +104,13 @@ var r_direction := Vector3(0.0, 0.0, 0.0)
 var aim_direction := 0.0
 var shoot_mode := false
 
-# Get the gravity from the project settings to be synced with RigidBody nodes.
-var world_gravity = ProjectSettings.get_setting("physics/3d/default_gravity")
 var gravity := jump_gravity
 
-func _ready():
+func _ready() -> void:
 	_hand_raycast.set_process(false)
 	print("fatherson")
 	
-func _process(delta):
+func _process(delta:float):
 	pass
 
 func get_horizontal_input() -> Vector3:
@@ -131,9 +136,10 @@ func get_horizontal_speed() -> float:
 	return Vector3(velocity.x, 0, velocity.z).length()
 
 func add_horizontal_speed(speed: float) -> void:
-	var speedx = velocity.x + velocity.x / get_horizontal_speed() * speed
-	var speedz = velocity.z + velocity.z / get_horizontal_speed() * speed
-	velocity = Vector3(speedx, velocity.y, speedz)
+	var real_velo = get_real_velocity().normalized() * speed
+	printt("adicionou?", Vector3(real_velo.x * speed, real_velo.y, real_velo.z * speed))
+	velocity.x += real_velo.x
+	velocity.z += real_velo.z
 	
 func set_speed_to_direction(h_direction: Vector3, xspeed: float, yspeed: float) -> void:
 	velocity = Vector3(h_direction.x * xspeed, yspeed, h_direction.z * xspeed)
@@ -146,7 +152,6 @@ func add_speed_to_direction(h_direction: Vector3, xspeed: float, yspeed: float) 
 	#velocity = Vector3(cappedx, velocity.y, cappedz)
 	
 func _physics_process(delta):
-	Global.debug.add_debug_property("FPS", Engine.get_frames_per_second(), 1)
 	Global.debug.add_debug_property("Input", get_horizontal_input(), 1)
 	Global.debug.add_debug_property("Velocity", velocity, 1)
 	Global.debug.add_debug_property("Speed", Vector3(velocity.x, 0, velocity.z).length(), 1)
@@ -174,6 +179,10 @@ func _physics_process(delta):
 			
 	if rotation_ang != _player_pivot.rotation.y:
 		_player_pivot.rotation.y = lerp_angle(_player_pivot.rotation.y, rotation_ang, rotate_speed * delta)
+	
+	#_gobot.set_head_target($DirectionTarget.get_path())
+	#else: _gobot.set_head_target("")
+	
 	##Old script below
 	
 	#Enters camera's shoot mode when shooting, like in Risk of Rain 2
@@ -271,8 +280,12 @@ func _unhandled_input(event):
 	#if Input.is_action_just_pressed("Left"): #Test deadzone not working
 		#print(Input.get_action_strength("Left"))
 	
-	if Input.is_action_pressed("Lock"): Global.locked = true
-	else: Global.locked = false
+	if Input.is_action_pressed("Lock"):
+		_gobot.set_head_target(get_viewport().get_camera_3d().get_path())
+		Global.locked = true
+	if Input.is_action_just_released("Lock"):
+		_gobot.set_head_target("")
+		Global.locked = false
 
 func _on_water_detection_area_entered(area):
 	Global.on_water = true

@@ -13,13 +13,13 @@ config_version=5
 config/name="Do 0"
 config/tags=PackedStringArray("3d", "platformer")
 run/main_scene="res://debug_island.tscn"
-config/features=PackedStringArray("4.3", "Forward Plus")
+config/features=PackedStringArray("4.4", "Forward Plus")
+run/max_fps=60
 config/icon="res://icon.svg"
 
 [autoload]
 
 Global="*res://Global.gd"
-EmbedGameAutoload="*res://addons/fabimakesgames.embed_game/embed_game_autoload.gd"
 
 [debug]
 
@@ -27,12 +27,7 @@ gdscript/warnings/untyped_declaration=1
 
 [display]
 
-window/size/always_on_top=true
 window/vsync/vsync_mode=0
-
-[editor_plugins]
-
-enabled=PackedStringArray("res://addons/fabimakesgames.embed_game/plugin.cfg")
 
 [input]
 
@@ -152,4 +147,3 @@ textures/canvas_textures/default_texture_repeat=1
 textures/lossless_compression/force_png=true
 textures/default_filters/use_nearest_mipmap_filter=true
 textures/default_filters/anisotropic_filtering_level=3
-anti_aliasing/quality/msaa_3d=3

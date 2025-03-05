@@ -1,0 +1,30 @@
+[gd_scene load_steps=5 format=3 uid="uid://pwly4sy6t125"]
+
+[ext_resource type="PackedScene" uid="uid://bh4vgbjvxh8av" path="res://Player/player_controller.tscn" id="1_bpidm"]
+[ext_resource type="PackedScene" uid="uid://6fp4j4y37vhd" path="res://Debug/debug.tscn" id="2_d83l8"]
+[ext_resource type="PackedScene" uid="uid://d30v3c2c5im1d" path="res://GUI/pause.tscn" id="3_ej8yq"]
+[ext_resource type="PackedScene" uid="uid://baomrlkbvbdkb" path="res://GUI/hud.tscn" id="4_gdgm2"]
+
+[node name="Node3D" type="Node3D"]
+
+[node name="CSGBox3D" type="CSGBox3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
+use_collision = true
+size = Vector3(30, 1, 30)
+
+[node name="Player Controller" parent="." instance=ExtResource("1_bpidm")]
+
+[node name="GUI" type="Control" parent="."]
+process_mode = 3
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Debug" parent="GUI" instance=ExtResource("2_d83l8")]
+layout_mode = 1
+
+[node name="Pause" parent="GUI" instance=ExtResource("3_ej8yq")]
+layout_mode = 1
+
+[node name="HUD" parent="GUI" instance=ExtResource("4_gdgm2")]

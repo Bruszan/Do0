@@ -1,0 +1,18 @@
+[gd_resource type="Environment" load_steps=4 format=3 uid="uid://cwu0kccntes8k"]
+
+[ext_resource type="Texture2D" uid="uid://cq7o1vkavvxax" path="res://Shaders/SKY1.png" id="1_dsrjw"]
+
+[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_686de"]
+panorama = ExtResource("1_dsrjw")
+filter = false
+
+[sub_resource type="Sky" id="Sky_d42dd"]
+sky_material = SubResource("PanoramaSkyMaterial_686de")
+
+[resource]
+background_mode = 2
+sky = SubResource("Sky_d42dd")
+tonemap_mode = 3
+tonemap_exposure = 0.6
+tonemap_white = 0.4
+ssao_enabled = true

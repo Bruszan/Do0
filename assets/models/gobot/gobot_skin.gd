@@ -26,7 +26,6 @@ signal foot_step
 @export var _left_eye_mat: StandardMaterial3D 
 @export var _right_eye_mat: StandardMaterial3D
 
-
 func _ready():
 	_blink_timer.connect(
 			"timeout",
@@ -43,7 +42,11 @@ func _ready():
 				_right_eye_mat.albedo_texture = _open_eye
 				_blink_timer.start(randf_range(1.0, 8.0))
 	)
+	#$gobot/Armature/Skeleton3D/LookAtModifier3D.target_node = get_viewport().get_camera_3d().get_path()
 
+func set_head_target(target_path : String) -> void: 
+	printt("New Head Target",target_path)
+	$gobot/Armature/Skeleton3D/LookAtModifier3D.target_node = target_path
 
 func _set_blink(state: bool):
 	if blink == state:

@@ -1,14 +1,14 @@
-[gd_scene load_steps=35 format=3 uid="uid://bl3w81m6ok38y"]
+[gd_scene load_steps=33 format=3 uid="uid://bl3w81m6ok38y"]
 
-[ext_resource type="PackedScene" uid="uid://b2k886kn8sd2y" path="res://Player/player.tscn" id="1_dnmpn"]
 [ext_resource type="Texture2D" uid="uid://d1xe0rax0mi8x" path="res://assets/textures/kenney_prototype-textures/Dark/texture_01.png" id="1_elnlr"]
-[ext_resource type="Script" path="res://debug_island.gd" id="1_nn3nm"]
+[ext_resource type="Script" uid="uid://hvs6qcapona0" path="res://debug_island.gd" id="1_nn3nm"]
+[ext_resource type="PackedScene" uid="uid://bh4vgbjvxh8av" path="res://Player/player_controller.tscn" id="2_d4bmm"]
 [ext_resource type="Texture2D" uid="uid://dbyyrhna031gx" path="res://icon.svg" id="2_wlt03"]
-[ext_resource type="Texture2D" uid="uid://cq7o1vkavvxax" path="res://Shaders/SKY1.png" id="2_wyph2"]
-[ext_resource type="Script" path="res://Sprite3D.gd" id="3_sgm8a"]
+[ext_resource type="Script" uid="uid://btuqfy4fmi31h" path="res://Sprite3D.gd" id="3_sgm8a"]
 [ext_resource type="PackedScene" uid="uid://kpp8mxcmg1sf" path="res://Coin/coin.tscn" id="4_a0rvu"]
+[ext_resource type="Environment" uid="uid://cwu0kccntes8k" path="res://debug_island.tres" id="4_d4bmm"]
 [ext_resource type="PackedScene" uid="uid://d1a2hn2lber41" path="res://Shaders/water_plane.tscn" id="7_v1xal"]
-[ext_resource type="Shader" path="res://Shaders/water2o.gdshader" id="8_mvkne"]
+[ext_resource type="Shader" uid="uid://dvm5cpocvjdo2" path="res://Shaders/water2o.gdshader" id="8_mvkne"]
 [ext_resource type="PackedScene" uid="uid://6fp4j4y37vhd" path="res://Debug/debug.tscn" id="9_h3p6m"]
 [ext_resource type="PackedScene" uid="uid://d30v3c2c5im1d" path="res://GUI/pause.tscn" id="10_n1plg"]
 [ext_resource type="PackedScene" uid="uid://baomrlkbvbdkb" path="res://GUI/hud.tscn" id="12_i4ssu"]
@@ -25,19 +25,9 @@ size = Vector3(12.8, 1, 12.8)
 [sub_resource type="BoxShape3D" id="BoxShape3D_3dmmu"]
 size = Vector3(12.8, 1, 12.8)
 
-[sub_resource type="PanoramaSkyMaterial" id="PanoramaSkyMaterial_686de"]
-panorama = ExtResource("2_wyph2")
-filter = false
-
-[sub_resource type="Sky" id="Sky_d42dd"]
-sky_material = SubResource("PanoramaSkyMaterial_686de")
-
-[sub_resource type="Environment" id="Environment_d721y"]
-background_mode = 2
-sky = SubResource("Sky_d42dd")
-tonemap_mode = 3
-tonemap_exposure = 0.6
-tonemap_white = 0.5
+[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_kuor8"]
+auto_exposure_enabled = true
+auto_exposure_speed = 0.2
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_2ayxi"]
 noise_type = 2
@@ -59,13 +49,15 @@ seamless = true
 as_normal_map = true
 noise = SubResource("FastNoiseLite_35mbd")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_nxx0m"]
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_d4bmm"]
 resource_local_to_scene = true
 render_priority = 0
 shader = ExtResource("8_mvkne")
 shader_parameter/primary_color = Color(0.372455, 0.567747, 1, 1)
 shader_parameter/secondary_color = Color(0.19921, 0.428185, 1, 1)
 shader_parameter/roughness = 0.0
+shader_parameter/normalmap_a = SubResource("NoiseTexture2D_xq444")
+shader_parameter/normalmap_b = SubResource("NoiseTexture2D_6glte")
 shader_parameter/normalmap_a_strength = 0.25
 shader_parameter/normalmap_b_strength = 0.25
 shader_parameter/movement_direction = Vector2(0.2, 0.1)
@@ -73,14 +65,12 @@ shader_parameter/movement_strength = 0.08
 shader_parameter/uv_scale = 2.0
 shader_parameter/depth_distance = 50.0
 shader_parameter/beers_law = 1.0
-shader_parameter/water_opacity = 0.5
-shader_parameter/refraction_strength = 0.5
-shader_parameter/normalmap_a = SubResource("NoiseTexture2D_xq444")
-shader_parameter/normalmap_b = SubResource("NoiseTexture2D_6glte")
+shader_parameter/water_opacity = 1.0
+shader_parameter/refraction_strength = 0.1
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_8ciao"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_kuor8"]
 resource_local_to_scene = true
-material = SubResource("ShaderMaterial_nxx0m")
+material = SubResource("ShaderMaterial_d4bmm")
 size = Vector2(500, 500)
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_6bghr"]
@@ -105,6 +95,8 @@ shader = ExtResource("8_mvkne")
 shader_parameter/primary_color = Color(0, 0.392157, 1, 1)
 shader_parameter/secondary_color = Color(0, 0.215686, 0.588235, 1)
 shader_parameter/roughness = 0.0
+shader_parameter/normalmap_a = SubResource("NoiseTexture2D_ou7p6")
+shader_parameter/normalmap_b = SubResource("NoiseTexture2D_s7b6m")
 shader_parameter/normalmap_a_strength = 0.5
 shader_parameter/normalmap_b_strength = 0.5
 shader_parameter/movement_direction = Vector2(0.2, 0.1)
@@ -114,8 +106,6 @@ shader_parameter/depth_distance = 50.0
 shader_parameter/beers_law = 10.0
 shader_parameter/water_opacity = 0.5
 shader_parameter/refraction_strength = 0.02
-shader_parameter/normalmap_a = SubResource("NoiseTexture2D_ou7p6")
-shader_parameter/normalmap_b = SubResource("NoiseTexture2D_s7b6m")
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_8di4n"]
 lightmap_size_hint = Vector2i(32, 32)
@@ -142,13 +132,7 @@ script = ExtResource("1_nn3nm")
 [node name="Entities" type="Node" parent="."]
 process_mode = 1
 
-[node name="Eu" parent="Entities" instance=ExtResource("1_dnmpn")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 9.53674e-07, 0)
-use_base_accel = false
-base_accel = null
-wall_jump_y_velocity = 40.0
-swim_friction = 70.0
-swim_rot_turn = 6.0
+[node name="Player Controller" parent="Entities" instance=ExtResource("2_d4bmm")]
 
 [node name="Floor" type="StaticBody3D" parent="."]
 transform = Transform3D(10, 0, 0, 0, 10, 0, 0, 0, 10, 0, 0, 0)
@@ -164,7 +148,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 shape = SubResource("BoxShape3D_3dmmu")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
-environment = SubResource("Environment_d721y")
+environment = ExtResource("4_d4bmm")
+camera_attributes = SubResource("CameraAttributesPractical_kuor8")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
@@ -210,7 +195,7 @@ script = ExtResource("3_sgm8a")
 
 [node name="WaterPlane" parent="." instance=ExtResource("7_v1xal")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
-mesh = SubResource("PlaneMesh_8ciao")
+mesh = SubResource("PlaneMesh_kuor8")
 
 [node name="Objects" type="Node3D" parent="."]
 

@@ -1,21 +1,19 @@
-[gd_scene load_steps=25 format=3 uid="uid://b2k886kn8sd2y"]
+[gd_scene load_steps=21 format=3 uid="uid://b2k886kn8sd2y"]
 
-[ext_resource type="Script" path="res://Player/player.gd" id="1_7jeha"]
+[ext_resource type="Script" uid="uid://jj5xa5gmb1oo" path="res://Player/player.gd" id="1_7jeha"]
 [ext_resource type="Texture2D" uid="uid://bkgby1a2hc1gp" path="res://assets/face.png" id="2_jy1v5"]
 [ext_resource type="PackedScene" uid="uid://cy36aygvs66pn" path="res://assets/models/gobot/gobot_skin.tscn" id="2_mjd0f"]
 [ext_resource type="Texture2D" uid="uid://dq675fmt1rg8c" path="res://assets/models/gobot/textures/open_eye.png" id="4_thq80"]
-[ext_resource type="Script" path="res://Player/States/state_machine.gd" id="5_1i5tj"]
-[ext_resource type="Script" path="res://CameraScripts/gdq_camera.gd" id="5_jwnp6"]
-[ext_resource type="Shader" path="res://Shaders/underwater.gdshader" id="6_614p6"]
-[ext_resource type="Script" path="res://Player/States/idle.gd" id="6_os27r"]
-[ext_resource type="Script" path="res://Player/States/move.gd" id="7_c745b"]
-[ext_resource type="Script" path="res://Player/States/jump.gd" id="8_av3pk"]
-[ext_resource type="Script" path="res://Player/States/fall.gd" id="9_q06yn"]
-[ext_resource type="Script" path="res://Player/States/slide.gd" id="10_ua1jj"]
-[ext_resource type="Script" path="res://Player/States/dive.gd" id="10_v5ivr"]
-[ext_resource type="Script" path="res://Player/States/swim.gd" id="11_c3761"]
-[ext_resource type="Script" path="res://Player/States/wall_slide.gd" id="12_euwmw"]
-[ext_resource type="Script" path="res://Player/States/edge_grab.gd" id="13_7khgu"]
+[ext_resource type="Script" uid="uid://curor4ihk42ua" path="res://Player/States/state_machine.gd" id="5_1i5tj"]
+[ext_resource type="Script" uid="uid://cn5k3skwpa0d6" path="res://Player/States/idle.gd" id="6_os27r"]
+[ext_resource type="Script" uid="uid://j05b12tbakha" path="res://Player/States/move.gd" id="7_c745b"]
+[ext_resource type="Script" uid="uid://mqhknl2pkrce" path="res://Player/States/jump.gd" id="8_av3pk"]
+[ext_resource type="Script" uid="uid://cgfw2r6327brm" path="res://Player/States/fall.gd" id="9_q06yn"]
+[ext_resource type="Script" uid="uid://bpy86c0mrjbsy" path="res://Player/States/slide.gd" id="10_ua1jj"]
+[ext_resource type="Script" uid="uid://dnvp4lh2va4wm" path="res://Player/States/dive.gd" id="10_v5ivr"]
+[ext_resource type="Script" uid="uid://cqymiitubvp5t" path="res://Player/States/swim.gd" id="11_c3761"]
+[ext_resource type="Script" uid="uid://k0yd21r1t0cw" path="res://Player/States/wall_slide.gd" id="12_euwmw"]
+[ext_resource type="Script" uid="uid://b50s8kd76gcv2" path="res://Player/States/edge_grab.gd" id="13_7khgu"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_mvoqb"]
 radius = 0.6
@@ -40,15 +38,6 @@ roughness = 0.6
 uv1_offset = Vector3(0.1, 0, 0)
 texture_repeat = false
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_bdv2p"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_o3shv"]
-shader = ExtResource("6_614p6")
-shader_parameter/color = Color(6.33401e-05, 0.981444, 0.981444, 1)
-shader_parameter/speed = Vector2(0.03, 0.07)
-shader_parameter/wave_strength = 0.0
-shader_parameter/opacity = 0.5
-
 [node name="Player" type="CharacterBody3D"]
 collision_layer = 3
 collision_mask = 524289
@@ -56,18 +45,13 @@ floor_constant_speed = true
 floor_block_on_wall = false
 floor_snap_length = 1.0
 script = ExtResource("1_7jeha")
-ground_top_speed = 25.0
-use_base_speed = true
-base_speed = 10.0
 base_accel = 5.0
-time_to_top_speed = 1.0
-time_to_stop = 0.1
 time_to_brake = 0.05
 overspeed_decel = 10
 air_accel = 40.0
 air_friction = 20.0
-wall_jump_y_velocity = 35.0
-wall_jump_velocity = 15.0
+wall_friction = 20.0
+wall_jump_y_velocity = 20.0
 swim_friction = 20.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -113,40 +97,8 @@ transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 0.7, 0.4)
 target_position = Vector3(0, 0, 1)
 debug_shape_thickness = 5
 
-[node name="CameraTwist" type="Node3D" parent="."]
-unique_name_in_owner = true
-process_mode = 3
-transform = Transform3D(1, 0, 0, 0, 0.939693, -0.34202, 0, 0.34202, 0.939693, 0, 2, 0)
-script = ExtResource("5_jwnp6")
-mouse_sensitivity = 0.17
-tilt_upper_limit = 1.57
-tilt_lower_limit = -1.57
-initial_height = 2.5
-lock_distance = 2.0
-lock_height = 2.1
-
-[node name="CameraPitch" type="Node3D" parent="CameraTwist"]
-
-[node name="SpringArm3D" type="SpringArm3D" parent="CameraTwist"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
-shape = SubResource("SphereShape3D_bdv2p")
-spring_length = 5.0
-margin = 0.2
-
-[node name="Camera3D" type="Camera3D" parent="CameraTwist/SpringArm3D"]
-
-[node name="CanvasLayer" type="CanvasLayer" parent="CameraTwist/SpringArm3D/Camera3D"]
-
-[node name="ColorRect" type="ColorRect" parent="CameraTwist/SpringArm3D/Camera3D/CanvasLayer"]
-visible = false
-material = SubResource("ShaderMaterial_o3shv")
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(1, 1, 1, 0)
+[node name="DirectionTarget" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 
 [node name="State_Machine" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
 script = ExtResource("5_1i5tj")
@@ -180,5 +132,4 @@ script = ExtResource("12_euwmw")
 script = ExtResource("13_7khgu")
 
 [connection signal="area_entered" from="WaterDetection" to="." method="_on_water_detection_area_entered"]
-[connection signal="area_entered" from="WaterDetection" to="CameraTwist" method="_on_water_detection_area_entered"]
 [connection signal="area_exited" from="WaterDetection" to="." method="_on_water_detection_area_exited"]

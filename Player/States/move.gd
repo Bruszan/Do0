@@ -7,8 +7,10 @@ func get_horizontal_speed() -> float:
 	return Vector3(player.velocity.x, 0, player.velocity.z).length()
 
 func enter(previous_state_path: String, data := {}) -> void:
-	if player.use_base_speed and previous_state_path == "IDLE": 
-		player.velocity = player.get_horizontal_input().normalized() * player.base_speed
+	player._gobot.set_head_target(player._direction_target.get_path())
+	#if player.base_speed and player.get_horizontal_speed() < player.base_speed: 
+		#print("based")
+		#player.velocity = player.get_horizontal_input().normalized() * player.base_speed
 
 func physics_update(_delta: float) -> void:
 	var horizontal_input = player.get_horizontal_input()
@@ -27,11 +29,12 @@ func physics_update(_delta: float) -> void:
 	else: player._gobot.walk()
 	
 	if horizontal_input:
-		bonus_speed -= player.overspeed_decel * _delta
+		# Make the DirectionTarget node go to the input direction, so that the head can follow it
+		player._direction_target.position = horizontal_input.normalized()
 		#Tries to get the desired speed
 		#Assign a variable before so that velocity can change on all axis at the same time using Vector3 move_toward()
 		h = horizontal_input * (player.ground_top_speed + bonus_speed)
-		
+		bonus_speed -= player.overspeed_decel * _delta
 		# This is incase you want the player to maintain over the top speed
 		#if horizontal_speed <= player.ground_top_speed:
 			#h = horizontal_input * player.ground_top_speed
@@ -40,9 +43,10 @@ func physics_update(_delta: float) -> void:
 		
 		if horizontal_input.dot(player.velocity) <= 0.0:
 			# player is trying to move away from velocity
-			#print("desacelera   ", player.velocity.move_toward(Vector3(h.x, 0, h.z), _delta).length())
+			print("desacelera   ", player.velocity.move_toward(Vector3(h.x, 0, h.z), _delta).length())
 			player.velocity = player.velocity.move_toward(Vector3(h.x, player.velocity.y, h.z), player.ground_decel * _delta)
 		else:
+			print("acelera   ", player.velocity.move_toward(Vector3(h.x, 0, h.z), _delta).length())
 			# player is moving toward velocity
 			player.velocity = player.velocity.move_toward(Vector3(h.x, player.velocity.y, h.z), player.ground_accel * _delta)
 	else:
@@ -59,3 +63,5 @@ func physics_update(_delta: float) -> void:
 		finished.emit(IDLE)
 	elif Global.on_water:
 		finished.emit(DIVING)
+		
+func exit(): player._gobot.set_head_target("")

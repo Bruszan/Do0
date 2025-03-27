@@ -4,6 +4,7 @@ class_name Player extends CharacterBody3D
 @onready var _gobot := $PlayerPivot/GobotSkin
 @onready var _skeleton := $PlayerPivot/GobotSkin/gobot/Armature/Skeleton3D
 @onready var _camera_pivot := get_parent().find_child("CameraTwist")
+@onready var _camera_pitch := get_parent().find_child("CameraPitch")
 @onready var _camera := $CameraTwist/SpringArm3D/Camera3D
 
 @onready var _direction_target := $DirectionTarget
@@ -32,12 +33,11 @@ enum Rotation_Dir {
 @export_group("Ground Movement Parameters")
 @export var ground_top_speed := 25.0
 ## Parameters incase of having initial speed or accel when moving
-@export var base_speed := 10.0
+@export var base_speed := 0.0
 @export var use_base_accel := false
 @export var base_accel := 5.0 if use_base_accel else 0.0
-#@export var ground_accel := 0.2
+@export var ground_accel := 80.0
 #@export var time_to_top_speed := 0.5
-@export var ground_accel := 100.0
 #@onready var ground_accel := (ground_top_speed - base_speed) / time_to_top_speed
 #@export var time_to_stop := 0.5
 @export var ground_friction := 30.0
@@ -47,7 +47,7 @@ enum Rotation_Dir {
 @export var ground_decel := 150.0
 #@onready var ground_decel := ground_top_speed / time_to_stop
 ## Speed is reduced by this value per second when over the top ground speed
-@export var overspeed_decel := 30
+@export var overspeed_decel := 30.0
 
 @export_group("Jump Parameters")
 
@@ -67,7 +67,7 @@ enum Rotation_Dir {
 @export var sakurai_jump_height := 8.0
 
 @export_group("Air Movement Parameters")
-@export var air_top_speed := 20
+@export var air_top_speed := 20.0
 @export var air_accel := 28.0
 ##Deceleration in the air if there is no input
 @export var has_air_friction := false
@@ -82,19 +82,24 @@ enum Rotation_Dir {
 @export var drift_turn_factor := 1.2
 
 @export_group("Wall Jump Parameters")
-@export var wall_friction := 10.0
-@export var wall_jump_y_velocity := 8.0
-@export var wall_jump_velocity := 10.0
+@export var wall_friction := 20.0
+@export var wall_jump_y_velocity := 30.0
+@export var wall_jump_velocity := 20.0
+@export var wall_jump_air_accel := 10.0
 
 @export_group("Swimming Parameters")
 @export var swim_speed := 10.0
+@export var swim_accel := 20.0
 @export var swim_friction := 100.0
 @export var swim_rot_turn := 2.0
 
 @onready var horizontal_velocity := Vector3(velocity.x, 0, velocity.z)
 
 @onready var horizontal_direction := horizontal_velocity.normalized()
-@onready var horizontal_speed := Vector3(velocity.x, 0, velocity.z).length()
+var horizontal_speed = func(): return Vector3(velocity.x, 0, velocity.z).length()
+var h_input : Vector3
+var h_speed : float
+var h_velocity : Vector3
 
 var direction := Vector3(0.0, 0.0, 0.0)
 var elapsed := 0.0
@@ -109,14 +114,12 @@ var gravity := jump_gravity
 func _ready() -> void:
 	_hand_raycast.set_process(false)
 	print("fatherson")
-	
-func _process(delta:float):
-	pass
 
 func get_horizontal_input() -> Vector3:
 	var raw_input = Input.get_vector("Left", "Right", "Forward", "Back", 0.1)
 	return -Vector3(raw_input.x, 0, raw_input.y).rotated(Vector3.UP, _camera_pivot.rotation.y)
 
+# This function is returning a weaker value on diagonal input
 func _get_camera_oriented_input() -> Vector3:
 	var raw_input = Input.get_vector("Left", "Right", "Forward", "Back", 0.1)
 
@@ -145,67 +148,40 @@ func set_speed_to_direction(h_direction: Vector3, xspeed: float, yspeed: float) 
 	velocity = Vector3(h_direction.x * xspeed, yspeed, h_direction.z * xspeed)
 func add_speed_to_direction(h_direction: Vector3, xspeed: float, yspeed: float) -> void:
 	velocity = get_real_velocity() + Vector3(h_direction.x * xspeed, yspeed, h_direction.z * xspeed)
-
-#func cap_horizontal_speed(speed_cap: float) -> void:
-	#var cappedx = velocity.x / get_horizontal_speed() * speed_cap
-	#var cappedz = velocity.z / get_horizontal_speed() * speed_cap
-	#velocity = Vector3(cappedx, velocity.y, cappedz)
+	
+func _process(delta:float):
+	pass
 	
 func _physics_process(delta):
+	h_velocity = Vector3(velocity.x, 0, velocity.z)
+	h_speed = Vector3(velocity.x, 0, velocity.z).length()
+	
 	Global.debug.add_debug_property("Input", get_horizontal_input(), 1)
 	Global.debug.add_debug_property("Velocity", velocity, 1)
-	Global.debug.add_debug_property("Speed", Vector3(velocity.x, 0, velocity.z).length(), 1)
+	Global.debug.add_debug_property("H_Speed", Vector3(velocity.x, 0, velocity.z).length(), 1)
+	Global.debug.add_debug_property("V_Speed", velocity.y, 1)
 	# Add the gravity.
 	if not is_on_floor() and not Global.on_water:
 		velocity.y -= gravity * delta
-
 	move_and_slide()
 	#Rotate the player to its velocity directionrotation_dir == Rotation_Dir.INPUT:
 	if rotation_dir == Rotation_Dir.INPUT:
-		var input_dir = get_horizontal_input()
-		if get_horizontal_input():
-			rotation_ang = atan2(input_dir.x, input_dir.z)
+		if h_input:
+			rotation_ang = atan2(h_input.x, h_input.z)
 		elif get_horizontal_velocity(): rotation_ang = atan2(velocity.x, velocity.z)
 	elif rotation_dir == Rotation_Dir.VELOCITY:
 		if get_horizontal_velocity():
 			rotation_ang = atan2(velocity.x, velocity.z)
 	elif rotation_dir == Rotation_Dir.VELOCINPUT:
-		var input_dir = get_horizontal_input()
-		if input_dir and get_horizontal_velocity():
-			var cross_vec = input_dir.cross(get_horizontal_velocity()).normalized()
+		if h_input and get_horizontal_velocity():
+			var cross_vec = h_input.cross(get_horizontal_velocity()).normalized()
 			rotation_ang = atan2(cross_vec.x, cross_vec.z)
-		elif get_horizontal_input(): rotation_ang = atan2(input_dir.x, input_dir.z)
+		elif h_input: rotation_ang = atan2(h_input.x, h_input.z)
 		elif get_horizontal_velocity(): rotation_ang = atan2(velocity.x, velocity.z)
 			
 	if rotation_ang != _player_pivot.rotation.y:
 		_player_pivot.rotation.y = lerp_angle(_player_pivot.rotation.y, rotation_ang, rotate_speed * delta)
 	
-	#_gobot.set_head_target($DirectionTarget.get_path())
-	#else: _gobot.set_head_target("")
-	
-	##Old script below
-	
-	#Enters camera's shoot mode when shooting, like in Risk of Rain 2
-	#if shoot_mode:
-		#elapsed += delta
-		#print(elapsed)
-		#if elapsed <= 3:
-			#$Global.camera_mode = "strafe"
-		#else: 
-			#elapsed = 0.0
-			#$Global.camera_mode = "free"
-			#shoot_mode = false
-			
-	#var head = Quaternion.from_euler(_skeleton.global_rotation) * _skeleton.get_bone_pose_rotation(24)
-	#print(head)
-	#Trying to make the head follow the direction of the camera (like Demon's Souls remake)
-	#var head = _skeleton.global_transform * _skeleton.get_bone_global_pose(24)
-	#head = head.looking_at($Camera_Twist.basis.x)
-	#print(head, "   ", vector3i)
-	#_skeleton.set_bone_global_pose_override(24, _skeleton.global_transform.affine_inverse() * head, 1.0, true)
-	#_skeleton.set_bone_pose_rotation(24, vector3i * 0)
-	#print(_skeleton.get_bone_pose_rotation(24), "  ", vector3i)
-	#_skeleton.set_bone_pose_rotation(24, head)
 	
 	##If there is a direction being input to aim, rotate the head/gun to it
 	if aim_direction:
@@ -217,14 +193,7 @@ func _physics_process(delta):
 				print("chegay")
 				aim_direction = 0.0
 		elif Global.camera_mode == "free":
-			#Rotate head by the direction of the right stick and limit it to just 180 degrees in relation to the body
-			#$Head.rotation.y = clampf(aim_direction + int(_player_pivot.rotation.y/PI) 
-									#* PI, _player_pivot.rotation.y - PI/2, _player_pivot.rotation.y + PI/2)
-							#Head direction should be the angle in relation to player's body
-			#var head_direction :=  aim_direction + int(_player_pivot.rotation.y/PI) * PI
-			#print(aim_direction, "  ", head_direction, "  ", $Head.rotation.y, "  ", _player_pivot.rotation.y)
 			if Global.locked: _camera_pivot.target_rotation = lerp_angle(_camera_pivot.rotation.y, aim_direction-PI, 30*delta)
-			#$Head.rotation.y = aim_direction
 			
 			#Rotate the body if the head reach a rotation larger than 90 degrees compared to the body
 			#if abs(abs($Head.rotation.y) - abs(_player_pivot.rotation.y)) >= PI/2: _player_pivot.rotation.y = $Head.rotation.y - PI/2
@@ -232,13 +201,9 @@ func _physics_process(delta):
 		#print($Head.rotation.y, "  ", _player_pivot.rotation.y)
 
 func _unhandled_input(event):
-	#if Input.is_action_just_pressed("Pause"): 
-		#Global.paused = not Global.paused
-		#if Global.paused: 
-			#temp_velocity = velocity
-			#velocity = Vector3.ZERO
-		#else: velocity = temp_velocity
-		
+	## Get the horizontal input to use on all the state scripts
+	h_input = get_horizontal_input()
+	
 	if Input.is_action_just_pressed("Reset"):
 		position = Vector3.ZERO
 		velocity = Vector3.ZERO
@@ -258,34 +223,6 @@ func _unhandled_input(event):
 			
 	if Input.is_action_pressed("Shoot"): shoot_mode = true
 		
-	#Reset camera to the direction the player is facing
-	#if Input.is_action_pressed("Reset_Camera"):
-		#_camera_pivot.rotation.x = lerp_angle(_camera_pivot.rotation.x,
-															#deg_to_rad(-10),
-															#20 * get_process_delta_time())
-		#if direction: #If the player is holding a direction it will rotate to that direction
-			#ang_base = atan2(direction.x, direction.z) 
-		#else: #If not holding any direction, the camera will reset to the player's direction
-			#ang_base = _player_pivot.rotation.y
-		#
-		#_camera_pivot.target_rotation = ang_base - PI
-		#
-		#print(_camera_pivot.target_rotation)
-		
-		#var CameraTween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
-		#CameraTween.tween_property($Camera_Twist, "rotation:y", target_rotation, 1)
-		#CameraTween.tween_property($Camera_Twist/Camera_Pitch, "rotation:x", deg_to_rad(-10), 1)
-		#camera_reset = true
-		
-	#if Input.is_action_just_pressed("Left"): #Test deadzone not working
-		#print(Input.get_action_strength("Left"))
-	
-	if Input.is_action_pressed("Lock"):
-		_gobot.set_head_target(get_viewport().get_camera_3d().get_path())
-		Global.locked = true
-	if Input.is_action_just_released("Lock"):
-		_gobot.set_head_target("")
-		Global.locked = false
 
 func _on_water_detection_area_entered(area):
 	Global.on_water = true

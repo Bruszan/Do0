@@ -17,7 +17,7 @@ func enter(previous_state_path: String, data := {}) -> void:
 	
 func physics_update(_delta: float) -> void:
 	# Handle the animation and rotation
-	if player.velocity.length() >= 0.5: 
+	if player.velocity.length() >= player.swim_speed * 0.5: 
 		player._gobot.swim()
 		#Rotate the player based on its verticality
 		# Find the angle the player should rotate to
@@ -28,9 +28,10 @@ func physics_update(_delta: float) -> void:
 		player._player_pivot.rotation.x = lerp(player._player_pivot.rotation.x, 0.0, 5 * _delta)
 	
 	# Handle the velocity
-	if swim_input and player.velocity.length() <= player.ground_top_speed:
+	if swim_input:
 		printt(swim_input.length(), swim_input, v_rot_angle, player._camera_pitch.rotation.x)
 		player.velocity = player.velocity.move_toward(swim_input * player.swim_speed, player.ground_accel * _delta)
+		if player.velocity.length() >= player.swim_speed: player.velocity = player.velocity.move_toward(Vector3.ZERO, player.swim_friction * _delta)
 		#printt(swim_input, player.velocity)
 	else: player.velocity = player.velocity.move_toward(Vector3.ZERO, player.swim_friction * _delta)
 	
@@ -40,12 +41,12 @@ func physics_update(_delta: float) -> void:
 		player.velocity.y = 0.0
 		if player.is_on_floor(): finished.emit(RUNNING)
 		elif Input.is_action_pressed("Slide"): player.velocity.y =- player.swim_speed
-		elif Input.is_action_just_pressed("Jump"):
+		elif Input.is_action_pressed("Jump"):
 			finished.emit(JUMPING)
 		
 ## Called by the state machine when receiving unhandled input events.
 func handle_input(_event: InputEvent) -> void:
-	# Grab the axis separately so that it's not normalized
+	# Grab the axis separately because it's not normalized
 	var input_xdir = Input.get_axis("Left", "Right")
 	var input_ydir = Input.get_axis("Forward", "Back")
 	
@@ -70,8 +71,6 @@ func handle_input(_event: InputEvent) -> void:
 		vertical_input = 1
 	if Input.is_action_pressed("Slide"):
 		vertical_input = -1
-	# Deadzone to avoid vertical input that is not intended
-	#if vertical_input < 0.1 and vertical_input > -0.1: vertical_input = 0.0
 	
 	# Adding the vertical velocity
 	swim_input.y = vertical_input

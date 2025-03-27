@@ -12,7 +12,11 @@ sky_material = SubResource("PanoramaSkyMaterial_686de")
 [resource]
 background_mode = 2
 sky = SubResource("Sky_d42dd")
+ambient_light_color = Color(1, 1, 1, 1)
 tonemap_mode = 3
 tonemap_exposure = 0.6
 tonemap_white = 0.4
-ssao_enabled = true
+ssr_enabled = true
+fog_depth_begin = 1090.0
+fog_depth_end = 4000.0
+volumetric_fog_length = 12.0

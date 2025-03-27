@@ -19,7 +19,7 @@ func physics_update(_delta: float) -> void:
 		#player._player_pivot.rotation = Vector3(player._camera_pivot.rotation.x, player._camera_pitch.rotation.y, player._camera_pivot.rotation.z)
 		h = horizontal_input * player.swim_speed
 
-		player.velocity = player.velocity.move_toward(Vector3(h.x, h.y, h.z), player.air_accel * _delta)
+		player.velocity = player.velocity.move_toward(Vector3(h.x, h.y, h.z), player.swim_accel * _delta)
 	else:
 		player.velocity = player.velocity.move_toward(Vector3.ZERO, player.swim_friction * _delta)
 	

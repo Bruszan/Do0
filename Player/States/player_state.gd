@@ -6,6 +6,7 @@ const SLIDING = "Slide"
 const JUMPING = "Jump"
 const FALLING = "Fall"
 const WALLING = "WallSlide"
+const WALL_JUMPING = "WallJump"
 const EDGING = "EdgeGrab"
 const DIVING = "Dive"
 

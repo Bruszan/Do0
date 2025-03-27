@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3 uid="uid://b2k886kn8sd2y"]
+[gd_scene load_steps=22 format=3 uid="uid://b2k886kn8sd2y"]
 
 [ext_resource type="Script" uid="uid://jj5xa5gmb1oo" path="res://Player/player.gd" id="1_7jeha"]
 [ext_resource type="Texture2D" uid="uid://bkgby1a2hc1gp" path="res://assets/face.png" id="2_jy1v5"]
@@ -14,6 +14,7 @@
 [ext_resource type="Script" uid="uid://cqymiitubvp5t" path="res://Player/States/swim.gd" id="11_c3761"]
 [ext_resource type="Script" uid="uid://k0yd21r1t0cw" path="res://Player/States/wall_slide.gd" id="12_euwmw"]
 [ext_resource type="Script" uid="uid://b50s8kd76gcv2" path="res://Player/States/edge_grab.gd" id="13_7khgu"]
+[ext_resource type="Script" uid="uid://dfq55i3ot357t" path="res://Player/States/wall_jump.gd" id="14_dkpta"]
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_mvoqb"]
 radius = 0.6
@@ -39,19 +40,19 @@ uv1_offset = Vector3(0.1, 0, 0)
 texture_repeat = false
 
 [node name="Player" type="CharacterBody3D"]
-collision_layer = 3
+collision_layer = 2
 collision_mask = 524289
-floor_constant_speed = true
+wall_min_slide_angle = 0.0
 floor_block_on_wall = false
-floor_snap_length = 1.0
+floor_snap_length = 0.5
 script = ExtResource("1_7jeha")
+ground_top_speed = 20.0
+base_speed = 10.0
 base_accel = 5.0
 time_to_brake = 0.05
-overspeed_decel = 10
+air_top_speed = 15.0
 air_accel = 40.0
 air_friction = 20.0
-wall_friction = 20.0
-wall_jump_y_velocity = 20.0
 swim_friction = 20.0
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -98,7 +99,6 @@ target_position = Vector3(0, 0, 1)
 debug_shape_thickness = 5
 
 [node name="DirectionTarget" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 
 [node name="State_Machine" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
 script = ExtResource("5_1i5tj")
@@ -127,6 +127,9 @@ script = ExtResource("10_ua1jj")
 
 [node name="WallSlide" type="Node" parent="State_Machine"]
 script = ExtResource("12_euwmw")
+
+[node name="WallJump" type="Node" parent="State_Machine"]
+script = ExtResource("14_dkpta")
 
 [node name="EdgeGrab" type="Node" parent="State_Machine"]
 script = ExtResource("13_7khgu")

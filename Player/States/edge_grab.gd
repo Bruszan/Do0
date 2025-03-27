@@ -33,7 +33,7 @@ func physics_update(_delta: float) -> void:
 		
 	if Input.is_action_just_pressed("Jump"):
 		print(aim_direction)
-		player.set_speed_to_direction(aim_direction, player.wall_jump_velocity, player.wall_jump_y_velocity)
-		finished.emit(JUMPING)
+		#player.set_speed_to_direction(aim_direction, player.wall_jump_velocity, player.wall_jump_y_velocity)
+		finished.emit(WALL_JUMPING)
 	elif Input.is_action_pressed("Slide"):
 		finished.emit(FALLING)

@@ -17,28 +17,37 @@ shader_parameter/opacity = 0.5
 
 [node name="Player" parent="." instance=ExtResource("1_cxhyj")]
 ground_top_speed = 20.0
-ground_accel = 150.0
+ground_accel = 100.0
 ground_friction = 70.0
+overspeed_decel = 10.0
 jump_height = 5.0
-air_top_speed = 10
+jump_time_to_peak = 0.5
+jump_time_to_descent = 0.4
+wall_jump_y_velocity = 20.0
+wall_jump_velocity = 15.0
 
-[node name="CameraTwist" type="Node3D" parent="."]
+[node name="CameraTwist" type="Node3D" parent="." node_paths=PackedStringArray("_player")]
 unique_name_in_owner = true
 process_mode = 3
-transform = Transform3D(1, 0, 0, 0, 0.939693, -0.34202, 0, 0.34202, 0.939693, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 0.939693, -0.34202, 0, 0.34202, 0.939693, 0, 2, 0)
 script = ExtResource("2_fdr7o")
+_player = NodePath("../Player")
 mouse_sensitivity = 0.005
+auto_sensitivity = 0.0
 tilt_upper_limit = 1.57
 tilt_lower_limit = -1.57
 initial_height = 2.5
 lock_height = 2.0
+lerp_h_pos = 50.0
+air_lerp_v_pos = 1.0
+auto_pitch_str = 2.0
 
 [node name="CameraPitch" type="Node3D" parent="CameraTwist"]
 
 [node name="SpringArm3D" type="SpringArm3D" parent="CameraTwist"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
 shape = SubResource("SphereShape3D_ab3ww")
-spring_length = 5.0
+spring_length = 4.5
 margin = 0.2
 
 [node name="Camera3D" type="Camera3D" parent="CameraTwist/SpringArm3D"]

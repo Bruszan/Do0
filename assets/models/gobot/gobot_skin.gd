@@ -44,9 +44,15 @@ func _ready():
 	)
 	#$gobot/Armature/Skeleton3D/LookAtModifier3D.target_node = get_viewport().get_camera_3d().get_path()
 
-func set_head_target(target_path : String) -> void: 
+func clear_head_target() -> void: 
+	$gobot/Armature/Skeleton3D/LookAtModifier3D.target_node = ""
+	
+func set_head_target(target_path : String, f_axis : int, y_offset : float) -> void: 
 	printt("New Head Target",target_path)
-	$gobot/Armature/Skeleton3D/LookAtModifier3D.target_node = target_path
+	var look_at_mod = $gobot/Armature/Skeleton3D/LookAtModifier3D
+	look_at_mod.target_node = target_path
+	look_at_mod.forward_axis = f_axis
+	look_at_mod.origin_offset.y = y_offset
 
 func _set_blink(state: bool):
 	if blink == state:
@@ -91,7 +97,7 @@ func fall():
 func edge_grab():
 	_state_machine.travel("EdgeGrab")
 	#_animation_tree.set_callback_mode_process(2)
-	
+
 ## Sets the model to an edge-grabbing animation.
 func edge_aim(pos : float):
 	if not _state_machine.get_current_node() == "EdgeAim":
@@ -105,8 +111,11 @@ func edge_aim(pos : float):
 	
 ## Sets the model to a wall-sliding animation.
 func wall_slide():
-	print("grudei")
 	_state_machine.travel("WallSlide")
+	
+## Sets the model to a wall-sliding animation.
+func wall_jump():
+	_state_machine.travel("WallJump")
 
 ### Plays a one-shot front-flip animation.
 ### This animation does not play in parallel with other states.

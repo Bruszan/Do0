@@ -3,8 +3,6 @@
 [ext_resource type="Texture2D" uid="uid://d1xe0rax0mi8x" path="res://assets/textures/kenney_prototype-textures/Dark/texture_01.png" id="1_elnlr"]
 [ext_resource type="Script" uid="uid://hvs6qcapona0" path="res://debug_island.gd" id="1_nn3nm"]
 [ext_resource type="PackedScene" uid="uid://bh4vgbjvxh8av" path="res://Player/player_controller.tscn" id="2_d4bmm"]
-[ext_resource type="Texture2D" uid="uid://dbyyrhna031gx" path="res://icon.svg" id="2_wlt03"]
-[ext_resource type="Script" uid="uid://btuqfy4fmi31h" path="res://Sprite3D.gd" id="3_sgm8a"]
 [ext_resource type="PackedScene" uid="uid://kpp8mxcmg1sf" path="res://Coin/coin.tscn" id="4_a0rvu"]
 [ext_resource type="Environment" uid="uid://cwu0kccntes8k" path="res://debug_island.tres" id="4_d4bmm"]
 [ext_resource type="PackedScene" uid="uid://d1a2hn2lber41" path="res://Shaders/water_plane.tscn" id="7_v1xal"]
@@ -12,12 +10,13 @@
 [ext_resource type="PackedScene" uid="uid://6fp4j4y37vhd" path="res://Debug/debug.tscn" id="9_h3p6m"]
 [ext_resource type="PackedScene" uid="uid://d30v3c2c5im1d" path="res://GUI/pause.tscn" id="10_n1plg"]
 [ext_resource type="PackedScene" uid="uid://baomrlkbvbdkb" path="res://GUI/hud.tscn" id="12_i4ssu"]
+[ext_resource type="Script" uid="uid://b0s55qoks82dm" path="res://area_3d_test.gd" id="13_kuor8"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g6nn0"]
 albedo_texture = ExtResource("1_elnlr")
 uv1_scale = Vector3(0.625, 0.625, 0.625)
 uv1_triplanar = true
-texture_filter = 4
+texture_filter = 2
 
 [sub_resource type="BoxMesh" id="BoxMesh_2ye8y"]
 size = Vector3(12.8, 1, 12.8)
@@ -25,52 +24,41 @@ size = Vector3(12.8, 1, 12.8)
 [sub_resource type="BoxShape3D" id="BoxShape3D_3dmmu"]
 size = Vector3(12.8, 1, 12.8)
 
-[sub_resource type="CameraAttributesPractical" id="CameraAttributesPractical_kuor8"]
-auto_exposure_enabled = true
-auto_exposure_speed = 0.2
-
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_2ayxi"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_mbhh7"]
 noise_type = 2
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_xq444"]
-width = 1024
-height = 1024
-seamless = true
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_p47e6"]
 as_normal_map = true
-noise = SubResource("FastNoiseLite_2ayxi")
+noise = SubResource("FastNoiseLite_mbhh7")
 
-[sub_resource type="FastNoiseLite" id="FastNoiseLite_35mbd"]
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_jrnee"]
 noise_type = 2
 
-[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_6glte"]
-width = 1024
-height = 1024
-seamless = true
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_4aipi"]
 as_normal_map = true
-noise = SubResource("FastNoiseLite_35mbd")
+noise = SubResource("FastNoiseLite_jrnee")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_d4bmm"]
-resource_local_to_scene = true
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_knggf"]
 render_priority = 0
 shader = ExtResource("8_mvkne")
-shader_parameter/primary_color = Color(0.372455, 0.567747, 1, 1)
-shader_parameter/secondary_color = Color(0.19921, 0.428185, 1, 1)
-shader_parameter/roughness = 0.0
-shader_parameter/normalmap_a = SubResource("NoiseTexture2D_xq444")
-shader_parameter/normalmap_b = SubResource("NoiseTexture2D_6glte")
-shader_parameter/normalmap_a_strength = 0.25
+shader_parameter/primary_color = Color(0, 0, 1, 1)
+shader_parameter/secondary_color = Color(0, 0.729412, 1, 1)
+shader_parameter/roughness = 0.045
+shader_parameter/normalmap_a = SubResource("NoiseTexture2D_p47e6")
+shader_parameter/normalmap_b = SubResource("NoiseTexture2D_4aipi")
+shader_parameter/normalmap_a_strength = 0.5
 shader_parameter/normalmap_b_strength = 0.25
 shader_parameter/movement_direction = Vector2(0.2, 0.1)
-shader_parameter/movement_strength = 0.08
-shader_parameter/uv_scale = 2.0
-shader_parameter/depth_distance = 50.0
-shader_parameter/beers_law = 1.0
-shader_parameter/water_opacity = 1.0
-shader_parameter/refraction_strength = 0.1
+shader_parameter/movement_strength = 0.12
+shader_parameter/uv_scale = 5.0
+shader_parameter/depth_distance = 30.0
+shader_parameter/beers_law = 0.5
+shader_parameter/water_opacity = 0.6
+shader_parameter/refraction_strength = 1.25
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_kuor8"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_slgjq"]
 resource_local_to_scene = true
-material = SubResource("ShaderMaterial_d4bmm")
+material = SubResource("ShaderMaterial_knggf")
 size = Vector2(500, 500)
 
 [sub_resource type="FastNoiseLite" id="FastNoiseLite_6bghr"]
@@ -125,6 +113,13 @@ size = Vector3(20, 20, 20)
 [sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_tekfg"]
 data = PackedVector3Array(-10, 10, 10, 10, -10, 10, -10, -10, 10, -10, 10, -10, -10, -10, -10, 10, -10, -10, -10, 10, 10, -10, 10, -10, 10, -10, 10, -10, 10, -10, 10, -10, -10, 10, -10, 10, -10, 10, -10, -10, 10, 10, -10, -10, -10, -10, 10, 10, -10, -10, 10, -10, -10, -10, -10, -10, 10, 10, -10, 10, -10, -10, -10, 10, -10, 10, 10, -10, -10, -10, -10, -10)
 
+[sub_resource type="PrismMesh" id="PrismMesh_kuor8"]
+size = Vector3(2, 2, 1)
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_kuor8"]
+height = 1.0
+radius = 2.0
+
 [node name="Debug_Island" type="Node3D"]
 process_mode = 1
 script = ExtResource("1_nn3nm")
@@ -149,7 +144,6 @@ shape = SubResource("BoxShape3D_3dmmu")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = ExtResource("4_d4bmm")
-camera_attributes = SubResource("CameraAttributesPractical_kuor8")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
@@ -187,20 +181,14 @@ hud = NodePath("../../GUI/HUD")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9, 2, -3)
 hud = NodePath("../../GUI/HUD")
 
-[node name="Sprite3D" type="Sprite3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3, 0)
-visible = false
-texture = ExtResource("2_wlt03")
-script = ExtResource("3_sgm8a")
-
 [node name="WaterPlane" parent="." instance=ExtResource("7_v1xal")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.1, 0)
-mesh = SubResource("PlaneMesh_kuor8")
+mesh = SubResource("PlaneMesh_slgjq")
 
 [node name="Objects" type="Node3D" parent="."]
 
 [node name="Pool" type="CSGTorus3D" parent="Objects"]
-transform = Transform3D(40, 0, 0, 0, 60, 0, 0, 0, 40, 0, 0, 45)
+transform = Transform3D(40, 0, 0, 0, 60, 0, 0, 0, 40, 45.2818, 0, 45)
 use_collision = true
 inner_radius = 0.25
 outer_radius = 0.5
@@ -267,3 +255,17 @@ transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -40, 0
 use_collision = true
 polygon = PackedVector2Array(20, 15, 20, 0, 0, 0)
 depth = 20.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 1, 20)
+mesh = SubResource("PrismMesh_kuor8")
+
+[node name="Area3D" type="Area3D" parent="MeshInstance3D"]
+collision_layer = 0
+collision_mask = 2
+script = ExtResource("13_kuor8")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="MeshInstance3D/Area3D"]
+shape = SubResource("CylinderShape3D_kuor8")
+
+[connection signal="body_entered" from="MeshInstance3D/Area3D" to="MeshInstance3D/Area3D" method="_on_body_entered"]

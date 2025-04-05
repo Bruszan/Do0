@@ -58,7 +58,6 @@ enum Rotation_Dir {
 @onready var jump_velocity := (jump_height * 2.0) / jump_time_to_peak
 @onready var jump_gravity := (jump_height * -2.0) / pow(jump_time_to_peak, 2)
 @onready var fall_gravity := (jump_height * -2.0) / pow(jump_time_to_descent, 2)
-
 ## The jump presented in Sakurai's games. See his video on Jump mechanics to know more
 @export var sakurai_jump := false
 ## The default is the same as Smash Ultimate
@@ -117,7 +116,7 @@ func _ready() -> void:
 
 func get_horizontal_input() -> Vector3:
 	var raw_input = Input.get_vector("Left", "Right", "Forward", "Back", 0.1)
-	return -Vector3(raw_input.x, 0, raw_input.y).rotated(Vector3.UP, _camera_pivot.rotation.y)
+	return Vector3(raw_input.x, 0, raw_input.y).rotated(Vector3.UP, _camera_pivot.rotation.y)
 
 # This function is returning a weaker value on diagonal input
 func _get_camera_oriented_input() -> Vector3:

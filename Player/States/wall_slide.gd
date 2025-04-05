@@ -15,7 +15,7 @@ func physics_update(_delta: float) -> void:
 	
 	if player.is_on_floor(): finished.emit(RUNNING)
 	elif not player.is_on_wall() or player.h_input.dot(player.get_wall_normal()) >= 0.0: finished.emit(FALLING)
-	elif Input.is_action_just_pressed("Jump"): finished.emit(WALL_JUMPING)
+	elif InputBuffer.is_action_press_buffered("Jump"): finished.emit(WALL_JUMPING)
 	
 	
 func exit() -> void:

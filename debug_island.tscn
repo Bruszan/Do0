@@ -146,7 +146,7 @@ shape = SubResource("BoxShape3D_3dmmu")
 environment = ExtResource("4_d4bmm")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
+transform = Transform3D(1, 0, 0, 0, 0.707107, 0.707107, 0, -0.707107, 0.707107, 0, 0, 0)
 top_level = true
 shadow_enabled = true
 directional_shadow_mode = 1
@@ -216,7 +216,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 shape = SubResource("BoxShape3D_mhcjt")
 
 [node name="Ramp2" type="MeshInstance3D" parent="Objects"]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -50, 10, -20)
+transform = Transform3D(1, 0, 1.06581e-14, 0, 1, 0, -1.06581e-14, 0, 1, -50, 10, 42)
 mesh = SubResource("PrismMesh_wn3ex")
 skeleton = NodePath("../..")
 
@@ -235,6 +235,42 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10, 15, -50)
 use_collision = true
 size = Vector3(10, 30, 10)
 
+[node name="CSGPolygon3D" type="CSGPolygon3D" parent="Objects"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -40, 0, 12)
+use_collision = true
+polygon = PackedVector2Array(20, 15, 20, 0, 0, 0)
+depth = 20.0
+
+[node name="CSGBox3D3" type="CSGBox3D" parent="Objects"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 54, 5, -5)
+use_collision = true
+size = Vector3(20, 10, 30)
+
+[node name="CSGBox3D5" type="CSGBox3D" parent="Objects"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 46, 13, -32)
+use_collision = true
+size = Vector3(10, 15, 10)
+
+[node name="CSGBox3D4" type="CSGBox3D" parent="Objects"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 25, 27, -40)
+use_collision = true
+size = Vector3(30, 10, 5)
+
+[node name="CSGBox3D6" type="CSGBox3D" parent="Objects"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20, 33, -25)
+use_collision = true
+size = Vector3(30, 10, 5)
+
+[node name="CSGBox3D7" type="CSGBox3D" parent="Objects"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 43, 22, -19)
+use_collision = true
+size = Vector3(5, 10, 5)
+
+[node name="CSGBox3D8" type="CSGBox3D" parent="Objects"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16, 3, 10)
+use_collision = true
+size = Vector3(1, 5, 1)
+
 [node name="GUI" type="Control" parent="."]
 process_mode = 3
 layout_mode = 3
@@ -249,12 +285,6 @@ layout_mode = 1
 layout_mode = 1
 
 [node name="HUD" parent="GUI" instance=ExtResource("12_i4ssu")]
-
-[node name="CSGPolygon3D" type="CSGPolygon3D" parent="."]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -40, 0, -40)
-use_collision = true
-polygon = PackedVector2Array(20, 15, 20, 0, 0, 0)
-depth = 20.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 1, 20)

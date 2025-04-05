@@ -29,7 +29,7 @@ func physics_update(_delta: float) -> void:
 	
 	# Handle the velocity
 	if swim_input:
-		printt(swim_input.length(), swim_input, v_rot_angle, player._camera_pitch.rotation.x)
+		printt(swim_input.length(), swim_input, v_rot_angle, player._camera_pitch.global_rotation.x)
 		player.velocity = player.velocity.move_toward(swim_input * player.swim_speed, player.ground_accel * _delta)
 		if player.velocity.length() >= player.swim_speed: player.velocity = player.velocity.move_toward(Vector3.ZERO, player.swim_friction * _delta)
 		#printt(swim_input, player.velocity)
@@ -54,13 +54,13 @@ func handle_input(_event: InputEvent) -> void:
 	var h_input_length = Input.get_vector("Left", "Right", "Forward", "Back", 0.1).length()
 	#var h_input_length = Vector2(input_xdir, input_ydir).normalized().length()
 	# Have the camera pitch influence the vertical input based on the forward an back input
-	var vertical_input = input_ydir * sin(player._camera_pitch.rotation.x)
+	var vertical_input =- input_ydir * sin(player._camera_pitch.global_rotation.x)
 	# Multiply so that it ascends and descends the same as the movement input
 	vertical_input *= h_input_length
 	
 	# Adjusting only the forward and back input to the camera pitch for the horizontal input
-	input_ydir *= cos(player._camera_pitch.rotation.x)
-	var horizontal_input = -player._camera_pivot.global_basis.z * input_ydir + -player._camera_pitch.global_basis.x * input_xdir
+	input_ydir *= cos(player._camera_pitch.global_rotation.x)
+	var horizontal_input = player._camera_pivot.global_basis.z * input_ydir + player._camera_pitch.global_basis.x * input_xdir
 	
 	# Adding the horizontal velocity
 	swim_input = horizontal_input
@@ -72,7 +72,7 @@ func handle_input(_event: InputEvent) -> void:
 	if Input.is_action_pressed("Slide"):
 		vertical_input = -1
 	
-	# Adding the vertical velocity
+	# Overwriting the vertical swim input if one of those buttons are pressed
 	swim_input.y = vertical_input
 	
 	# Normalize it at last
@@ -80,7 +80,7 @@ func handle_input(_event: InputEvent) -> void:
 	
 	# Multiply the horizontal swim_input by the horizontal input length
 	swim_input *= Vector3(h_input_length, 1.0, h_input_length)
-	#printt(h_input_length, input_ydir)
+	printt(h_input_length, input_ydir)
 	#v_rot_angle =- swim_input.y * PI/2
 	#v_rot_angle =- atan2(vertical_input, Vector3(swim_input.x, 0, swim_input.z).length())
 

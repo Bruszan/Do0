@@ -1,10 +1,12 @@
-[gd_scene load_steps=6 format=3 uid="uid://bh4vgbjvxh8av"]
+[gd_scene load_steps=7 format=3 uid="uid://bh4vgbjvxh8av"]
 
 [ext_resource type="PackedScene" uid="uid://b2k886kn8sd2y" path="res://Player/player.tscn" id="1_cxhyj"]
 [ext_resource type="Script" uid="uid://cqpecn2g7x8vn" path="res://CameraScripts/gdq_camera.gd" id="2_fdr7o"]
 [ext_resource type="Shader" uid="uid://0d27y25t6wnk" path="res://Shaders/underwater.gdshader" id="3_hur7u"]
 
-[sub_resource type="SphereShape3D" id="SphereShape3D_ab3ww"]
+[sub_resource type="SphereShape3D" id="SphereShape3D_cxhyj"]
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_fdr7o"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_x6j2f"]
 shader = ExtResource("3_hur7u")
@@ -16,8 +18,7 @@ shader_parameter/opacity = 0.5
 [node name="Player Controller" type="Node3D"]
 
 [node name="Player" parent="." instance=ExtResource("1_cxhyj")]
-ground_top_speed = 20.0
-ground_accel = 100.0
+base_speed = 0.0
 ground_friction = 70.0
 overspeed_decel = 10.0
 jump_height = 5.0
@@ -25,36 +26,46 @@ jump_time_to_peak = 0.5
 jump_time_to_descent = 0.4
 wall_jump_y_velocity = 20.0
 wall_jump_velocity = 15.0
+wall_jump_air_accel = 30.0
 
-[node name="CameraTwist" type="Node3D" parent="." node_paths=PackedStringArray("_player")]
+[node name="CameraTwist" type="Node3D" parent="." node_paths=PackedStringArray("_player", "_camera_arm", "_camera", "target_when_colliding")]
 unique_name_in_owner = true
 process_mode = 3
-transform = Transform3D(1, 0, 0, 0, 0.939693, -0.34202, 0, 0.34202, 0.939693, 0, 2, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2, 0)
 script = ExtResource("2_fdr7o")
 _player = NodePath("../Player")
+_camera_arm = NodePath("SpringArm3D")
+_camera = NodePath("Camera3D")
+target_when_colliding = NodePath("SpringArm3D/TargetWhenColliding")
 mouse_sensitivity = 0.005
 auto_sensitivity = 0.0
 tilt_upper_limit = 1.57
 tilt_lower_limit = -1.57
-initial_height = 2.5
 lock_height = 2.0
 lerp_h_pos = 50.0
 air_lerp_v_pos = 1.0
 auto_pitch_str = 2.0
 
+[node name="SpringArm3D" type="SpringArm3D" parent="CameraTwist"]
+shape = SubResource("SphereShape3D_cxhyj")
+spring_length = 4.5
+
+[node name="TargetWhenColliding" type="Node3D" parent="CameraTwist/SpringArm3D"]
+
 [node name="CameraPitch" type="Node3D" parent="CameraTwist"]
 
-[node name="SpringArm3D" type="SpringArm3D" parent="CameraTwist"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
-shape = SubResource("SphereShape3D_ab3ww")
-spring_length = 4.5
-margin = 0.2
+[node name="Camera3D" type="Camera3D" parent="CameraTwist"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 4.5)
 
-[node name="Camera3D" type="Camera3D" parent="CameraTwist/SpringArm3D"]
+[node name="Area3D" type="Area3D" parent="CameraTwist/Camera3D"]
+collision_layer = 0
 
-[node name="CanvasLayer" type="CanvasLayer" parent="CameraTwist/SpringArm3D/Camera3D"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="CameraTwist/Camera3D/Area3D"]
+shape = SubResource("SphereShape3D_fdr7o")
 
-[node name="ColorRect" type="ColorRect" parent="CameraTwist/SpringArm3D/Camera3D/CanvasLayer"]
+[node name="CanvasLayer" type="CanvasLayer" parent="CameraTwist/Camera3D"]
+
+[node name="ColorRect" type="ColorRect" parent="CameraTwist/Camera3D/CanvasLayer"]
 visible = false
 material = SubResource("ShaderMaterial_x6j2f")
 anchors_preset = 15
@@ -64,3 +75,5 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 color = Color(1, 1, 1, 0)
+
+[connection signal="body_shape_entered" from="CameraTwist/Camera3D/Area3D" to="CameraTwist" method="_on_area_3d_body_shape_entered"]

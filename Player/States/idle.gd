@@ -6,7 +6,7 @@ func enter(previous_state_path: String, data := {}) -> void:
 func physics_update(_delta: float) -> void:
 	player.velocity = player.velocity.move_toward(Vector3.ZERO, player.ground_friction * _delta)
 	
-	if Input.is_action_just_pressed("Jump"):
+	if InputBuffer.is_action_press_buffered("Jump"):
 		finished.emit(JUMPING)
 	elif not player.is_on_floor():
 		finished.emit(FALLING)

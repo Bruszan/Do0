@@ -61,7 +61,7 @@ func physics_update(_delta: float) -> void:
 	elif player.is_on_wall() and not abs(player.get_wall_normal().y):
 		if player.h_input.dot(player.get_wall_normal()) < 0.0:
 			finished.emit(WALLING)
-		elif Input.is_action_just_pressed("Jump"):
+		elif InputBuffer.is_action_press_buffered("Jump"):
 			## There is no wall jump state (yet?)
 			finished.emit(WALL_JUMPING)
 			

@@ -1,6 +1,12 @@
 extends Node3D
 
 @export var _player : Player
+@onready var _camera_pivot: Node3D = %CameraTwist
+@export var _camera_arm : SpringArm3D
+@export var _camera : Camera3D
+@export var target_when_colliding : Node3D
+var camera_attach := false
+
 @export_group("Camera")
 @export_range(0.0, 1.0, 0.001) var mouse_sensitivity := 0.01
 @export_range(0.0, 10.0, 0.1) var analog_sensitivity := 5.0
@@ -22,10 +28,6 @@ extends Node3D
 var _camera_input_direction := Vector2.ZERO
 var player_is_using_mouse := false
 var reset_finished := true
-
-@onready var _camera_pivot: Node3D = %CameraTwist
-@onready var _camera_arm = $SpringArm3D
-@onready var _camera = $SpringArm3D/Camera3D
 
 var target_rotation := 0.0
 var ang_base := 0.0
@@ -55,6 +57,13 @@ func target_camera_rotation():
 
 func _process(delta: float) -> void: 
 	Global.debug.add_debug_property("FPS", Engine.get_frames_per_second(), 1)
+	## The actual Camera3D target (alternative to SpringArm3D)
+	if camera_attach:
+		#printt(_camera.position.z, _camera_arm.get_hit_length())
+		_camera.position.z = _camera_arm.get_hit_length()
+		#print(_camera_arm.get_hit_length())
+	if _camera_arm.get_hit_length() >= _camera_arm.spring_length: 
+		camera_attach = false
 	#global_position.x = lerp(global_position.x, _player.global_position.x, abs(_player.global_position.x - global_position.x) * lerp_h_pos * delta)
 	global_position.x = _player.global_position.x
 	global_position.z = _player.global_position.z
@@ -77,7 +86,7 @@ func _process(delta: float) -> void:
 	## Targetting the camera for an angle, used for resetting the camera
 	if target_rotation and reset_finished: target_camera_rotation()
 	elif not player_is_using_mouse:
-		_camera_pivot.rotation.x -=- _camera_input_direction.y * delta
+		_camera_pivot.rotation.x -= _camera_input_direction.y * delta
 		_camera_pivot.rotation.x = clamp(rotation.x, -PI/2+0.001, PI/2)
 		_camera_pivot.rotation.y -= _camera_input_direction.x * delta
 
@@ -95,7 +104,7 @@ func _physics_process(delta: float) -> void:
 		var speed_str = _player.get_horizontal_speed() / _player.ground_top_speed
 		# 20 degrees will be added to the targeted pitch because it's the default angle
 		# So looking up will have 20 degrees less pitch than looking down, which is fine
-		_camera_pivot.rotation.x = lerp(_camera_pivot.rotation.x, target_pitch + deg_to_rad(20), auto_pitch_str * speed_str * delta)
+		_camera_pivot.rotation.x = lerp(_camera_pivot.rotation.x, target_pitch - deg_to_rad(20), auto_pitch_str * speed_str * delta)
 	#if _player.get_floor_angle(): printt(_player.get_floor_angle(), cam_basis.dot(_player.get_floor_normal()), target_pitch, angle_pitch_str)
 		
 func _input(event: InputEvent) -> void:
@@ -111,7 +120,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	)
 	if player_is_using_mouse:
 		_camera_input_direction = event.relative * mouse_sensitivity
-		rotation.x -= -_camera_input_direction.y
+		rotation.x -= _camera_input_direction.y
 		rotation.x = clamp(rotation.x, -PI/2+0.001, PI/2)
 		rotation.y -= _camera_input_direction.x
 		_camera_input_direction = Vector2.ZERO
@@ -158,3 +167,8 @@ func _unhandled_input(event: InputEvent) -> void:
 		#CameraTween.tween_property(self, "position:y", initial_height, 1)
 		_player._gobot.clear_head_target()
 		Global.locked = false
+
+
+func _on_area_3d_body_shape_entered(body_rid: RID, body: Node3D, body_shape_index: int, local_shape_index: int) -> void:
+	print("entrou body")
+	camera_attach = true

@@ -43,7 +43,7 @@ func physics_update(_delta: float) -> void:
 	#Slide script so that it can also be used as a drift to change the player's direction while maintaining speed
 	#Input for the player to drift while sliding
 	var input_dir = Input.get_vector("Left", "Right", "Forward", "Back", 0.1)
-	var horizontal_input = -player._camera_pivot.global_basis.z * input_dir.y + -player._camera_pivot.global_basis.x * input_dir.x
+	var horizontal_input = player._camera_pivot.global_basis.z * input_dir.y + player._camera_pivot.global_basis.x * input_dir.x
 	
 	##Rotating the player's velocity for drifting
 	#For rotating the player's velocity to the direction being input like this, the turn speed is dependant on the current velocity
@@ -70,7 +70,7 @@ func physics_update(_delta: float) -> void:
 		finished.emit(IDLE)
 	elif Input.is_action_just_pressed("Slide"):
 		finished.emit(RUNNING)
-	elif Input.is_action_just_pressed("Jump"):
+	elif InputBuffer.is_action_press_buffered("Jump"):
 		finished.emit(JUMPING)
 	elif not player.is_on_floor():
 		print(player.velocity.y)

@@ -54,7 +54,7 @@ func physics_update(_delta: float) -> void:
 		player.velocity = player.velocity.move_toward(Vector3(0, player.velocity.y, 0), player.ground_friction * _delta)
 	
 	
-	if Input.is_action_just_pressed("Jump"):
+	if InputBuffer.is_action_press_buffered("Jump"):
 		finished.emit(JUMPING)
 	elif Input.is_action_just_pressed("Slide"):
 		finished.emit(SLIDING)

@@ -119,7 +119,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED
 	)
 	if player_is_using_mouse:
-		_camera_input_direction = event.relative * mouse_sensitivity
+		_camera_input_direction = event.screen_relative * mouse_sensitivity
 		rotation.x -= _camera_input_direction.y
 		rotation.x = clamp(rotation.x, -PI/2+0.001, PI/2)
 		rotation.y -= _camera_input_direction.x

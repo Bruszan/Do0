@@ -1,4 +1,4 @@
-[gd_scene load_steps=33 format=3 uid="uid://bl3w81m6ok38y"]
+[gd_scene load_steps=35 format=3 uid="uid://bl3w81m6ok38y"]
 
 [ext_resource type="Texture2D" uid="uid://d1xe0rax0mi8x" path="res://assets/textures/kenney_prototype-textures/Dark/texture_01.png" id="1_elnlr"]
 [ext_resource type="Script" uid="uid://hvs6qcapona0" path="res://debug_island.gd" id="1_nn3nm"]
@@ -12,8 +12,16 @@
 [ext_resource type="PackedScene" uid="uid://baomrlkbvbdkb" path="res://GUI/hud.tscn" id="12_i4ssu"]
 [ext_resource type="Script" uid="uid://b0s55qoks82dm" path="res://area_3d_test.gd" id="13_kuor8"]
 
+[sub_resource type="FastNoiseLite" id="FastNoiseLite_slgjq"]
+frequency = 1.0
+
+[sub_resource type="NoiseTexture2D" id="NoiseTexture2D_d4bmm"]
+noise = SubResource("FastNoiseLite_slgjq")
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g6nn0"]
 albedo_texture = ExtResource("1_elnlr")
+roughness_texture = SubResource("NoiseTexture2D_d4bmm")
+rim_tint = 1.0
 uv1_scale = Vector3(0.625, 0.625, 0.625)
 uv1_triplanar = true
 texture_filter = 2

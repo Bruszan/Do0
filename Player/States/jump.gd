@@ -28,15 +28,15 @@ func enter(previous_state_path: String, data := {}) -> void:
 	#Play animation
 	player._gobot.jump()
 	
-	#print("squat  ", player.get_horizontal_speed())
+	#print("squat, current speed:", player.get_horizontal_speed())
 	if previous_state_path == "Slide" and player.is_on_floor():
 		player.velocity = slope_jump()
 	else:
-		print("jump!")
+		print("jump frame 1")
 		#Jump always the same velocity
 		player.velocity.y = jump_velocity
 	
-	printt("jump", player.velocity)
+	printt("jump frame 1 velocity:", player.velocity)
 	
 	#Enable and reset the raycast
 	player._hand_raycast.set_process(true)
@@ -51,7 +51,7 @@ func is_edge_grabbable() -> bool:
 		player._wall_raycast.set_process(true)
 		player._wall_raycast.position.y = player._hand_raycast.get_collision_point().y - 0.01
 		if player._wall_raycast.is_colliding():
-			print(Vector3(player._wall_raycast.get_collision_point().x, player._hand_raycast.get_collision_point().y, player._wall_raycast.get_collision_point().z))
+			print("can grab edge at",Vector3(player._wall_raycast.get_collision_point().x, player._hand_raycast.get_collision_point().y, player._wall_raycast.get_collision_point().z))
 			return true
 		else:
 			player._wall_raycast.set_process(false)
@@ -72,7 +72,7 @@ func physics_update(_delta: float) -> void:
 	# If the player has more air speed than the max, maintain it
 	if player.h_input:
 		if horizontal_speed > player.air_top_speed:
-			print("ta rapido no ar")
+			print("horizontal_speed > player.air_top_speed")
 			h = player.h_input * horizontal_speed
 		else:
 			h = player.h_input * player.air_top_speed
@@ -103,17 +103,17 @@ func physics_update(_delta: float) -> void:
 			Global.sakurai_jump_timer = 0.0
 		
 		if Global.sakurai_jump_timer > player.sakurai_initial_jump_duration:
-			print("sakurou")
+			print("reach sakurai jump timer")
 			player.velocity.y = sqrt(0 - 2.0 * -player.gravity * (player.sakurai_jump_height - player.sakurai_initial_jump_height))
 			player._gobot.jump_flip()
 	else:
-		#Change the gravity for the player to fall
+		#Halves y velocity when releasing jump
 		if Input.is_action_just_released("Jump"):
-			print("descendo")
+			print("jump button released")
 			player.velocity.y *= 0.5
 		
 		#Play flip animation when the player reaches the maximum height of the ground jump
-
+		# By predicting if player will start falling by next frame
 		if player.velocity.y - player.gravity * _delta <= 0 and Input.is_action_pressed("Jump"):
 			player._gobot.jump_flip()
 	

@@ -23,6 +23,7 @@ var camera_attach := false
 @export var lerp_v_pos := 8.0
 @export var air_lerp_v_pos := 0.5
 ## The strength of the angle auto correction when running on slopes
+@export var auto_pitch := true
 @export var auto_pitch_str := 1.0
 
 var _camera_input_direction := Vector2.ZERO
@@ -91,21 +92,22 @@ func _process(delta: float) -> void:
 		_camera_pivot.rotation.y -= _camera_input_direction.x * delta
 
 func _physics_process(delta: float) -> void:
-	## Make the camera pitch adapt to the angle of the floor related to the camera direction
-	if not _camera_input_direction.y and _player.is_on_floor():
-		# Get the camera basis to compare with the floor normal
-		var cam_basis = _camera_pivot.get_global_transform().basis.z
-		# Remove the y axis because we don't need it, and then normalize it
-		cam_basis = Vector3(cam_basis.x, 0, cam_basis.z).normalized()
-		var target_pitch = _player.get_floor_angle() * 1.2
-		# The dot is going between -0.7 and 0.7, so the camera will target 70% of the floor angle
-		target_pitch *= cam_basis.dot(_player.get_floor_normal())
-		# Make it proportional to the player speed to not make it distracting
-		var speed_str = _player.get_horizontal_speed() / _player.ground_top_speed
-		# 20 degrees will be added to the targeted pitch because it's the default angle
-		# So looking up will have 20 degrees less pitch than looking down, which is fine
-		_camera_pivot.rotation.x = lerp(_camera_pivot.rotation.x, target_pitch - deg_to_rad(20), auto_pitch_str * speed_str * delta)
-	#if _player.get_floor_angle(): printt(_player.get_floor_angle(), cam_basis.dot(_player.get_floor_normal()), target_pitch, angle_pitch_str)
+	if auto_pitch:
+		## Make the camera pitch adapt to the angle of the floor related to the camera direction
+		if not _camera_input_direction.y and _player.is_on_floor():
+			# Get the camera basis to compare with the floor normal
+			var cam_basis = _camera_pivot.get_global_transform().basis.z
+			# Remove the y axis because we don't need it, and then normalize it
+			cam_basis = Vector3(cam_basis.x, 0, cam_basis.z).normalized()
+			var target_pitch = _player.get_floor_angle() * 1.2
+			# The dot is going between -0.7 and 0.7, so the camera will target 70% of the floor angle
+			target_pitch *= cam_basis.dot(_player.get_floor_normal())
+			# Make it proportional to the player speed to not make it distracting
+			var speed_str = _player.get_horizontal_speed() / _player.ground_top_speed
+			# 20 degrees will be added to the targeted pitch because it's the default angle
+			# So looking up will have 20 degrees less pitch than looking down, which is fine
+			_camera_pivot.rotation.x = lerp(_camera_pivot.rotation.x, target_pitch - deg_to_rad(20), auto_pitch_str * speed_str * delta)
+		#if _player.get_floor_angle(): printt(_player.get_floor_angle(), cam_basis.dot(_player.get_floor_normal()), target_pitch, angle_pitch_str)
 		
 func _input(event: InputEvent) -> void:
 	if Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
@@ -154,19 +156,21 @@ func _unhandled_input(event: InputEvent) -> void:
 		reset_finished = false
 		CameraResetTween.finished.connect(func(): reset_finished = true)
 		
-	if Input.is_action_just_pressed("Lock"): _player._gobot.set_head_target(get_viewport().get_camera_3d().get_path(), 5, 1.5)
+	if Input.is_action_just_pressed("Lock"): 
+		_player._gobot.set_head_target(get_viewport().get_camera_3d().get_path(), 5, 1.5, 0.2)
+		_player.shoot_mode = true
 	if Input.is_action_pressed("Lock"):
+		
 		var CameraTween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
 		CameraTween.tween_property(_camera, "fov", lock_fov, 1)
 		#CameraTween.tween_property(self, "position:y",  lock_height, 1)
-		Global.locked = true
 		
 	if Input.is_action_just_released("Lock"):
 		var CameraTween = get_tree().create_tween().set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_EXPO).set_parallel(true)
 		CameraTween.tween_property(_camera, "fov", initial_fov, 1)
 		#CameraTween.tween_property(self, "position:y", initial_height, 1)
 		_player._gobot.clear_head_target()
-		Global.locked = false
+		_player.shoot_mode = false
 
 
 func _on_area_3d_body_shape_entered(body_rid: RID, body: Node3D, body_shape_index: int, local_shape_index: int) -> void:

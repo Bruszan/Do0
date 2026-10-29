@@ -4,11 +4,17 @@ var h := Vector3.ZERO
 var accel_stable := 0.0
 var bonus_speed : float
 var horizontal_speed : float
+@export_group("Head Direction Tracking Parameters")
+@export var sphere_lerp := 1.0
+@export var duration := 0.5
+@export var transition_type := Tween.TransitionType.TRANS_LINEAR
+@export var ease_type := Tween.EaseType.EASE_OUT_IN
 
 func enter(previous_state_path: String, data := {}) -> void:
 	horizontal_speed = Vector3(player.velocity.x, 0, player.velocity.z).length()
-	
-	player._gobot.set_head_target(player._direction_target.get_path(), 4, -0.5)
+	printt("shoot mode", player.shoot_mode)
+	if not player.shoot_mode:
+		player._gobot.set_head_target(player._direction_target.get_path(), 4, -0.5, duration, transition_type, ease_type)
 
 func physics_update(_delta: float) -> void:
 	if player.base_speed and horizontal_speed < player.base_speed: 
@@ -30,7 +36,7 @@ func physics_update(_delta: float) -> void:
 	
 	if player.h_input:
 		# Make the DirectionTarget node go to the input direction, so that the head can follow it
-		player._direction_target.position = player.h_input.normalized()
+		player._direction_target.position = lerp(player._direction_target.position, player.h_input.normalized(), sphere_lerp * _delta)
 		
 		bonus_speed = max(bonus_speed - player.overspeed_decel * _delta, 0.0)
 		#Tries to get the desired speed
@@ -59,6 +65,7 @@ func physics_update(_delta: float) -> void:
 	elif Input.is_action_just_pressed("Slide"):
 		finished.emit(SLIDING)
 	elif not player.is_on_floor():
+		player.velocity.y = player.jump_velocity
 		finished.emit(FALLING)
 	elif player.velocity == Vector3.ZERO:
 		finished.emit(IDLE)
@@ -66,4 +73,5 @@ func physics_update(_delta: float) -> void:
 		finished.emit(DIVING)
 		
 func exit() -> void:
-	player._gobot.clear_head_target()
+	if not player.shoot_mode:
+		player._gobot.clear_head_target()

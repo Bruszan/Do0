@@ -152,17 +152,26 @@ func _process(delta:float):
 	pass
 	
 func _physics_process(delta):
+	# Get horizontal velocity vector3
 	h_velocity = Vector3(velocity.x, 0, velocity.z)
+	# Get current horizontal speed value
 	h_speed = Vector3(velocity.x, 0, velocity.z).length()
 	
 	Global.debug.add_debug_property("Input", get_horizontal_input(), 1)
 	Global.debug.add_debug_property("Velocity", velocity, 1)
 	Global.debug.add_debug_property("H_Speed", Vector3(velocity.x, 0, velocity.z).length(), 1)
 	Global.debug.add_debug_property("V_Speed", velocity.y, 1)
-	# Add the gravity.
+	
 	if not is_on_floor() and not Global.on_water:
+		# Add the gravity
 		velocity.y -= gravity * delta
+		
+		# Remove block on wall while in the air, so that walls don't affect velocity vector
+		floor_block_on_wall = false
+	else: floor_block_on_wall = true
+	
 	move_and_slide()
+	
 	#Rotate the player to its velocity directionrotation_dir == Rotation_Dir.INPUT:
 	if rotation_dir == Rotation_Dir.INPUT:
 		if h_input:
@@ -181,24 +190,6 @@ func _physics_process(delta):
 	if rotation_ang != _player_pivot.rotation.y:
 		_player_pivot.rotation.y = lerp_angle(_player_pivot.rotation.y, rotation_ang, rotate_speed * delta)
 	
-	
-	##If there is a direction being input to aim, rotate the head/gun to it
-	if aim_direction:
-		#print("aim ", $Head.rotation.y, "  ", aim_direction)
-		if Global.camera_mode == "strafe":
-			$Head.rotation.y = lerp_angle($Head.rotation.y, aim_direction, 30*delta)
-			$Head.rotation.x = lerp_angle($Head.rotation.x, -$Camera_Twist/Camera_Pitch.rotation.x - deg_to_rad(10), 30*delta)
-			if abs($Head.rotation.y - aim_direction) <= 0.01:
-				print("chegay")
-				aim_direction = 0.0
-		elif Global.camera_mode == "free":
-			if Global.locked: _camera_pivot.target_rotation = lerp_angle(_camera_pivot.rotation.y, aim_direction-PI, 30*delta)
-			
-			#Rotate the body if the head reach a rotation larger than 90 degrees compared to the body
-			#if abs(abs($Head.rotation.y) - abs(_player_pivot.rotation.y)) >= PI/2: _player_pivot.rotation.y = $Head.rotation.y - PI/2
-		elif Global.camera_mode != "strafe": $Head.rotation.y = lerp_angle($Head.rotation.y, _player_pivot.rotation.y, 20*delta)
-		#print($Head.rotation.y, "  ", _player_pivot.rotation.y)
-
 func _unhandled_input(event):
 	## Get the horizontal input to use on all the state scripts
 	h_input = get_horizontal_input()
@@ -219,9 +210,6 @@ func _unhandled_input(event):
 			aim_direction = atan2(r_direction.x, r_direction.z)
 		elif Global.camera_mode == "strafe":
 			aim_direction = _camera_pivot.rotation.y - PI
-			
-	if Input.is_action_pressed("Shoot"): shoot_mode = true
-		
 
 func _on_water_detection_area_entered(area):
 	Global.on_water = true

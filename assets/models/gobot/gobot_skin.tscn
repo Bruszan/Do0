@@ -1,4 +1,4 @@
-[gd_scene load_steps=96 format=3 uid="uid://cy36aygvs66pn"]
+[gd_scene format=3 uid="uid://cy36aygvs66pn"]
 
 [ext_resource type="PackedScene" uid="uid://kod0awm1ha4o" path="res://assets/models/gobot/model/gobot.glb" id="1_qg1mb"]
 [ext_resource type="Script" uid="uid://b8sw54pq5wjak" path="res://assets/models/gobot/gobot_skin.gd" id="1_rwke8"]
@@ -3920,14 +3920,14 @@ animation = &"custom_lib/run_step"
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_01yhm"]
 graph_offset = Vector2(-396.667, 62.7238)
+nodes/output/position = Vector2(560, 80)
 nodes/Add2/node = SubResource("AnimationNodeAdd2_c6v15")
 nodes/Add2/position = Vector2(320, 120)
 nodes/Animation/node = SubResource("AnimationNodeAnimation_q8y1g")
 nodes/Animation/position = Vector2(100, 80)
 nodes/Step/node = SubResource("AnimationNodeAnimation_l1uic")
 nodes/Step/position = Vector2(100, 220)
-nodes/output/position = Vector2(560, 80)
-node_connections = [&"Add2", 0, &"Animation", &"Add2", 1, &"Step", &"output", 0, &"Add2"]
+node_connections = [&"output", 0, &"Add2", &"Add2", 0, &"Animation", &"Add2", 1, &"Step"]
 
 [sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_idskn"]
 animation = &"Slide"
@@ -4127,6 +4127,7 @@ graph_offset = Vector2(94, 124)
 
 [sub_resource type="AnimationNodeBlendTree" id="AnimationNodeBlendTree_8xvna"]
 graph_offset = Vector2(-161.848, -17.3293)
+nodes/output/position = Vector2(580, 80)
 nodes/Animation/node = SubResource("AnimationNodeAnimation_g4wg5")
 nodes/Animation/position = Vector2(180, 300)
 nodes/Flip/node = SubResource("AnimationNodeAnimation_oi1x1")
@@ -4137,10 +4138,9 @@ nodes/HurtShot/node = SubResource("AnimationNodeOneShot_g3q2d")
 nodes/HurtShot/position = Vector2(420, 80)
 nodes/StateMachine/node = SubResource("AnimationNodeStateMachine_fdt88")
 nodes/StateMachine/position = Vector2(0, 80)
-nodes/output/position = Vector2(580, 80)
-node_connections = [&"FlipShot", 0, &"StateMachine", &"FlipShot", 1, &"Flip", &"HurtShot", 0, &"FlipShot", &"HurtShot", 1, &"Animation", &"output", 0, &"HurtShot"]
+node_connections = [&"output", 0, &"HurtShot", &"FlipShot", 0, &"StateMachine", &"FlipShot", 1, &"Flip", &"HurtShot", 0, &"FlipShot", &"HurtShot", 1, &"Animation"]
 
-[node name="GobotSkin" type="Node3D" node_paths=PackedStringArray("gobot_model")]
+[node name="GobotSkin" type="Node3D" unique_id=1641451290 node_paths=PackedStringArray("gobot_model")]
 script = ExtResource("1_rwke8")
 gobot_model = NodePath("gobot/Armature/Skeleton3D/Gobot")
 blink = false
@@ -4151,53 +4151,54 @@ _close_eye = ExtResource("3_yxlpa")
 _left_eye_mat = ExtResource("4_p2r8e")
 _right_eye_mat = ExtResource("4_p2r8e")
 
-[node name="gobot" parent="." instance=ExtResource("1_qg1mb")]
+[node name="gobot" parent="." unique_id=1239396535 instance=ExtResource("1_qg1mb")]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 
-[node name="Skeleton3D" parent="gobot/Armature" index="0"]
+[node name="Skeleton3D" parent="gobot/Armature" parent_id_path=PackedInt32Array(1239396535, 24144093) index="0" unique_id=1782558566]
 bones/0/position = Vector3(0.0975476, 0.272276, 0.177033)
-bones/0/rotation = Quaternion(0.399231, -4.00768e-08, -1.74509e-08, 0.916851)
+bones/0/rotation = Quaternion(0.77254915, 0.10769103, -0.13622104, 0.61074907)
 bones/0/scale = Vector3(1, 1, 1)
-bones/1/position = Vector3(-0.0694287, 0.134651, -0.0624404)
-bones/1/rotation = Quaternion(0.931364, 1.59149e-08, -4.07112e-08, -0.364089)
+bones/1/position = Vector3(-0.0694287, 0.134651, -0.062440395)
+bones/1/rotation = Quaternion(0.6793683, -0.31008515, 0.39223418, 0.5370832)
 bones/1/scale = Vector3(1, 1, 1)
+bones/2/position = Vector3(0, 0.35911208, 0)
 bones/2/rotation = Quaternion(-0.201467, -0.392991, -0.35358, 0.824591)
-bones/4/rotation = Quaternion(-0.734245, -0.267929, -0.530202, 0.328609)
-bones/5/rotation = Quaternion(0.859052, 5.88875e-07, -2.93312e-05, 0.511888)
-bones/6/rotation = Quaternion(-0.409006, 0.0648996, 0.0590165, 0.908306)
-bones/7/rotation = Quaternion(0.592328, -8.8469e-07, 2.03029e-05, 0.805697)
-bones/8/rotation = Quaternion(-0.71399, -0.452326, -0.137307, 0.516495)
+bones/4/rotation = Quaternion(-0.7342452, -0.26792905, -0.5302021, 0.32860908)
+bones/5/rotation = Quaternion(0.8590521, 5.888752e-07, -2.933121e-05, 0.5118882)
+bones/6/rotation = Quaternion(-0.4090059, 0.064899586, 0.059016485, 0.9083057)
+bones/7/rotation = Quaternion(0.592328, -8.8468994e-07, 2.0302898e-05, 0.805697)
+bones/8/rotation = Quaternion(-0.7139897, -0.45232588, -0.13730697, 0.5164948)
 bones/8/scale = Vector3(1, 1, 1)
-bones/9/rotation = Quaternion(1.93572e-05, 3.32041e-07, -0.60398, 0.797)
-bones/10/rotation = Quaternion(-0.224118, -0.814034, -0.451398, 0.28872)
-bones/11/rotation = Quaternion(0.0298192, -0.0194152, -0.000472976, 0.999367)
-bones/12/rotation = Quaternion(0.418786, 0.00289001, 0.00546091, 0.908064)
+bones/9/rotation = Quaternion(1.935719e-05, 3.3204086e-07, -0.6039797, 0.7969997)
+bones/10/rotation = Quaternion(-0.22411808, -0.81403416, -0.4513981, 0.28872)
+bones/11/rotation = Quaternion(0.02981919, -0.019415192, -0.00047297575, 0.99936664)
+bones/12/rotation = Quaternion(0.41878593, 0.0028900097, 0.00546091, 0.908064)
 bones/12/scale = Vector3(1, 1, 1)
-bones/13/rotation = Quaternion(-0.0463128, 1.52608e-07, -3.22066e-05, 0.998927)
-bones/14/rotation = Quaternion(0.412485, -0.17502, 0.0643284, 0.891676)
+bones/13/rotation = Quaternion(-0.0463128, 1.5260798e-07, -3.22066e-05, 0.998927)
+bones/14/rotation = Quaternion(0.41248497, -0.17501998, 0.06432841, 0.89167595)
 bones/14/scale = Vector3(1, 1, 1)
-bones/15/rotation = Quaternion(-0.0463128, 1.53606e-07, -3.22284e-05, 0.998927)
-bones/16/rotation = Quaternion(-0.601643, 0.0171212, 0.639599, 0.478169)
+bones/15/rotation = Quaternion(-0.0463128, 1.5360601e-07, -3.22284e-05, 0.998927)
+bones/16/rotation = Quaternion(-0.601643, 0.017121233, 0.6395991, 0.47816902)
 bones/16/scale = Vector3(1, 1, 1)
-bones/17/rotation = Quaternion(2.01907e-05, -3.54262e-07, 0.621986, 0.783028)
+bones/17/rotation = Quaternion(2.0190706e-05, -3.5426206e-07, 0.6219861, 0.78302824)
 bones/17/scale = Vector3(1, 1, 1)
-bones/18/rotation = Quaternion(-0.289732, 0.637458, 0.217438, 0.680017)
-bones/19/rotation = Quaternion(0.487906, 0.0174399, -0.00854539, 0.87268)
-bones/20/rotation = Quaternion(-0.371224, 0.00197695, -0.00585366, 0.928523)
+bones/18/rotation = Quaternion(-0.28973204, 0.6374582, 0.21743803, 0.6800171)
+bones/19/rotation = Quaternion(0.48790604, 0.017439904, -0.008545391, 0.87268007)
+bones/20/rotation = Quaternion(-0.3712239, 0.0019769496, -0.005853659, 0.9285228)
 bones/20/scale = Vector3(1, 1, 1)
-bones/21/rotation = Quaternion(-0.502333, -1.50159e-05, 2.8513e-05, 0.864674)
-bones/22/rotation = Quaternion(-0.371224, 0.00197696, -0.00585367, 0.928523)
+bones/21/rotation = Quaternion(-0.5023331, -1.5015905e-05, 2.8513005e-05, 0.86467415)
+bones/22/rotation = Quaternion(-0.3712239, 0.0019769596, -0.0058536693, 0.9285228)
 bones/22/scale = Vector3(1, 1, 1)
-bones/23/rotation = Quaternion(-0.502333, -1.5023e-05, 2.85275e-05, 0.864674)
-bones/24/rotation = Quaternion(0.0452861, -0.446931, 0.0231192, 0.893122)
+bones/23/rotation = Quaternion(-0.5023331, -1.5023004e-05, 2.8527505e-05, 0.86467415)
+bones/24/position = Vector3(0, 0.189977, 0)
+bones/24/rotation = Quaternion(0.04528611, -0.44693112, 0.023119206, 0.89312226)
 bones/24/scale = Vector3(0.7, 0.7, 0.7)
 
-[node name="LookAtModifier3D" type="LookAtModifier3D" parent="gobot/Armature/Skeleton3D" index="0"]
+[node name="LookAtModifier3D" type="LookAtModifier3D" parent="gobot/Armature/Skeleton3D" index="0" unique_id=954515691]
 bone_name = "Head"
 bone = 24
 forward_axis = 5
-duration = 0.2
-ease_type = 3
+relative = true
 use_angle_limitation = true
 symmetry_limitation = true
 primary_limit_angle = 3.14159
@@ -4205,25 +4206,23 @@ primary_damp_threshold = 1.0
 secondary_limit_angle = 6.28319
 secondary_damp_threshold = 1.0
 
-[node name="AnimationPlayer" parent="gobot" index="1"]
-libraries = {
-&"": SubResource("AnimationLibrary_03he3"),
-&"custom_lib": ExtResource("6_vjupt")
-}
+[node name="AnimationPlayer" parent="gobot" index="1" unique_id=1234282973]
+libraries/ = SubResource("AnimationLibrary_03he3")
+libraries/custom_lib = ExtResource("6_vjupt")
 
-[node name="BlinkTimer" type="Timer" parent="."]
+[node name="BlinkTimer" type="Timer" parent="." unique_id=2085793368]
 unique_name_in_owner = true
 wait_time = 0.2
 one_shot = true
 autostart = true
 
-[node name="ClosedEyesTimer" type="Timer" parent="."]
+[node name="ClosedEyesTimer" type="Timer" parent="." unique_id=1789195216]
 unique_name_in_owner = true
 wait_time = 0.2
 one_shot = true
 autostart = true
 
-[node name="AnimationTree" type="AnimationTree" parent="."]
+[node name="AnimationTree" type="AnimationTree" parent="." unique_id=82813326]
 unique_name_in_owner = true
 root_node = NodePath("%AnimationTree/../gobot")
 tree_root = SubResource("AnimationNodeBlendTree_8xvna")

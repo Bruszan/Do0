@@ -47,12 +47,16 @@ func _ready():
 func clear_head_target() -> void: 
 	$gobot/Armature/Skeleton3D/LookAtModifier3D.target_node = ""
 	
-func set_head_target(target_path : String, f_axis : int, y_offset : float) -> void: 
+func set_head_target(target_path : String, f_axis : int, y_offset : float, duration : float = 0.0, 
+transition_type : Tween.TransitionType = Tween.TransitionType.TRANS_LINEAR, ease_type : Tween.EaseType = Tween.EaseType.EASE_OUT) -> void: 
 	printt("New Head Target",target_path)
 	var look_at_mod = $gobot/Armature/Skeleton3D/LookAtModifier3D
 	look_at_mod.target_node = target_path
 	look_at_mod.forward_axis = f_axis
 	look_at_mod.origin_offset.y = y_offset
+	if duration: look_at_mod.duration = duration
+	if transition_type: look_at_mod.transition_type = transition_type
+	if ease_type: look_at_mod.ease_type = ease_type
 
 func _set_blink(state: bool):
 	if blink == state:

@@ -1,4 +1,4 @@
-[gd_resource type="Environment" load_steps=4 format=3 uid="uid://cwu0kccntes8k"]
+[gd_resource type="Environment" format=3 uid="uid://cwu0kccntes8k"]
 
 [ext_resource type="Texture2D" uid="uid://cq7o1vkavvxax" path="res://Shaders/SKY1.png" id="1_dsrjw"]
 

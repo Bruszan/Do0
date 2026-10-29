@@ -1,4 +1,4 @@
-[gd_scene load_steps=22 format=3 uid="uid://b2k886kn8sd2y"]
+[gd_scene format=3 uid="uid://b2k886kn8sd2y"]
 
 [ext_resource type="Script" uid="uid://jj5xa5gmb1oo" path="res://Player/player.gd" id="1_7jeha"]
 [ext_resource type="Texture2D" uid="uid://bkgby1a2hc1gp" path="res://assets/face.png" id="2_jy1v5"]
@@ -32,14 +32,16 @@ texture_filter = 0
 radial_segments = 8
 rings = 4
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kcdhx"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dkpta"]
 resource_local_to_scene = true
 albedo_texture = ExtResource("4_thq80")
 roughness = 0.6
 uv1_offset = Vector3(0.1, 0, 0)
 texture_repeat = false
 
-[node name="Player" type="CharacterBody3D"]
+[sub_resource type="SphereMesh" id="SphereMesh_hgjhj"]
+
+[node name="Player" type="CharacterBody3D" unique_id=872224308]
 collision_layer = 2
 collision_mask = 524289
 wall_min_slide_angle = 0.0
@@ -55,83 +57,90 @@ air_accel = 40.0
 air_friction = 20.0
 swim_friction = 20.0
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1699458516]
 transform = Transform3D(0.8, 0, 0, 0, 0.8, 0, 0, 0, 0.8, 0, 0.8, 0)
 shape = SubResource("CylinderShape3D_mvoqb")
 
-[node name="WaterDetection" type="Area3D" parent="."]
+[node name="WaterDetection" type="Area3D" parent="." unique_id=119482971]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.2, 0)
 collision_layer = 524288
 collision_mask = 2
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="WaterDetection"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WaterDetection" unique_id=1653859644]
 transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 0, 0)
 shape = SubResource("SphereShape3D_lqdeb")
 
-[node name="PlayerModel" type="MeshInstance3D" parent="."]
+[node name="PlayerModel" type="MeshInstance3D" parent="." unique_id=1949022377]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
 visible = false
 mesh = SubResource("PrismMesh_f4n7y")
 
-[node name="Head" type="MeshInstance3D" parent="."]
+[node name="Head" type="MeshInstance3D" parent="." unique_id=1398798675]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, -1.06581e-14)
 visible = false
 material_override = SubResource("StandardMaterial3D_rmcwj")
 mesh = SubResource("SphereMesh_wii1v")
 
-[node name="PlayerPivot" type="Node3D" parent="."]
+[node name="PlayerPivot" type="Node3D" parent="." unique_id=693638553]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0)
 
-[node name="GobotSkin" parent="PlayerPivot" instance=ExtResource("2_mjd0f")]
+[node name="GobotSkin" parent="PlayerPivot" unique_id=791686273 instance=ExtResource("2_mjd0f")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0)
 _left_eye_mat_override = ""
 _right_eye_mat_override = ""
-_left_eye_mat = SubResource("StandardMaterial3D_kcdhx")
-_right_eye_mat = SubResource("StandardMaterial3D_kcdhx")
+_left_eye_mat = SubResource("StandardMaterial3D_dkpta")
+_right_eye_mat = SubResource("StandardMaterial3D_dkpta")
 
-[node name="HandRayCast3D" type="RayCast3D" parent="PlayerPivot"]
+[node name="HandRayCast3D" type="RayCast3D" parent="PlayerPivot" unique_id=1397969663]
 transform = Transform3D(0.7, 0, 0, 0, 0.7, 0, 0, 0, 0.7, 0, 2, 0.9)
 debug_shape_thickness = 5
 
-[node name="WallRayCast3D" type="RayCast3D" parent="PlayerPivot"]
+[node name="WallRayCast3D" type="RayCast3D" parent="PlayerPivot" unique_id=1530531767]
 transform = Transform3D(0.6, 0, 0, 0, 0.6, 0, 0, 0, 0.6, 0, 1.2, 0.4)
 target_position = Vector3(0, 0, 1)
 debug_shape_thickness = 5
 
-[node name="DirectionTarget" type="Node3D" parent="."]
+[node name="DirectionTarget" type="Node3D" parent="." unique_id=1169835672]
 
-[node name="State_Machine" type="Node" parent="." node_paths=PackedStringArray("initial_state")]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="DirectionTarget" unique_id=312714130]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+visible = false
+mesh = SubResource("SphereMesh_hgjhj")
+
+[node name="State_Machine" type="Node" parent="." unique_id=1654146300 node_paths=PackedStringArray("initial_state")]
 script = ExtResource("5_1i5tj")
 initial_state = NodePath("Idle")
 
-[node name="Idle" type="Node" parent="State_Machine"]
+[node name="Idle" type="Node" parent="State_Machine" unique_id=1509254803]
 script = ExtResource("6_os27r")
 
-[node name="Move" type="Node" parent="State_Machine"]
+[node name="Move" type="Node" parent="State_Machine" unique_id=34911543]
 script = ExtResource("7_c745b")
+sphere_lerp = 20.0
+ease_type = 1
 
-[node name="Dive" type="Node" parent="State_Machine"]
+[node name="Dive" type="Node" parent="State_Machine" unique_id=296997721]
 script = ExtResource("10_v5ivr")
 
-[node name="Swim" type="Node" parent="State_Machine"]
+[node name="Swim" type="Node" parent="State_Machine" unique_id=586592161]
 script = ExtResource("11_c3761")
 
-[node name="Jump" type="Node" parent="State_Machine"]
+[node name="Jump" type="Node" parent="State_Machine" unique_id=677343971]
 script = ExtResource("8_av3pk")
 
-[node name="Fall" type="Node" parent="State_Machine"]
+[node name="Fall" type="Node" parent="State_Machine" unique_id=2065575222]
 script = ExtResource("9_q06yn")
 
-[node name="Slide" type="Node" parent="State_Machine"]
+[node name="Slide" type="Node" parent="State_Machine" unique_id=824201713]
 script = ExtResource("10_ua1jj")
 
-[node name="WallSlide" type="Node" parent="State_Machine"]
+[node name="WallSlide" type="Node" parent="State_Machine" unique_id=533007190]
 script = ExtResource("12_euwmw")
 
-[node name="WallJump" type="Node" parent="State_Machine"]
+[node name="WallJump" type="Node" parent="State_Machine" unique_id=1531522230]
 script = ExtResource("14_dkpta")
 
-[node name="EdgeGrab" type="Node" parent="State_Machine"]
+[node name="EdgeGrab" type="Node" parent="State_Machine" unique_id=824762247]
 script = ExtResource("13_7khgu")
 
 [connection signal="area_entered" from="WaterDetection" to="." method="_on_water_detection_area_entered"]
